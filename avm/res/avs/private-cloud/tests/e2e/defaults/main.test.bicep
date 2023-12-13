@@ -7,13 +7,13 @@ metadata description = 'This instance deploys the module with the minimum set of
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'dep-${namePrefix}-avs-sddc-${serviceShort}-rg'
+param resourceGroupName string = '${namePrefix}-avs-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'sddc'
+param serviceShort string = 'test'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
@@ -25,7 +25,7 @@ param sku string = 'AV36'
 param clusterSize int = 3
 param internet string = 'Disabled'
 param tags object = {
-  'Created From': 'AVM Bicep Module'
+  'Created Using': 'AVM Bicep Module'
 }
 param identityType string = 'SystemAssigned'
 // Dependencies

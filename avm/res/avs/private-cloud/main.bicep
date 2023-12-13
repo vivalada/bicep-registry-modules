@@ -87,6 +87,7 @@ resource privateCloud 'Microsoft.AVS/privateClouds@2022-05-01' = {
     type: identityType
   }
   properties: {
+    availability: {}
     networkBlock: networkBlock
     internet: internet
     managementCluster: {
