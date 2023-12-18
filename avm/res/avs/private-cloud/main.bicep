@@ -2,18 +2,17 @@ metadata name = 'AVS Private Cloud'
 metadata description = 'This module deploys an AVS Private Cloud.'
 metadata owner = 'Azure/module-maintainers'
 
-// Parameters
 @description('Required. The AVS Private Cloud name.')
 param name string
 
-@description('Optional. Location for all resources.')
-param location string = resourceGroup().location
-
-@description('Optional. Resource tags.')
-param tags object?
-
 @description('Required. The private cloud SKU.')
 param sku string
+
+@description('Required. The network block for the private cloud.')
+param networkBlock string
+
+@description('Optional. Location for all resources.')
+param location string = resourceGroup().location
 
 @description('Optional. The identity of the private cloud, if configured.')
 @allowed([
@@ -22,18 +21,18 @@ param sku string
 ])
 param identityType string = 'None'
 
-@description('Required. The network block for the private cloud.')
-param networkBlock string
-
 @description('Optional. The internet access configuration.')
 @allowed([
   'Enabled'
   'Disabled'
 ])
-param internet string
+param internet string = 'Disabled'
 
 @description('Optional. The management cluster size.')
 param clusterSize int
+
+@description('Optional. Resource tags.')
+param tags object?
 
 @description('Optional. Enable/Disable usage telemetry for module.')
 param enableTelemetry bool = true
