@@ -31,6 +31,10 @@ param internet string = 'Disabled'
 @description('Optional. The management cluster size.')
 param clusterSize int
 
+@description('Optional. Set the NSX-T Manager password when the private cloud is created.')
+@secure()
+param nsxtPassword string?
+
 @description('Optional. Resource tags.')
 param tags object?
 
@@ -92,6 +96,7 @@ resource privateCloud 'Microsoft.AVS/privateClouds@2022-05-01' = {
     managementCluster: {
       clusterSize: clusterSize
     }
+    nsxtPassword: nsxtPassword
   }
 }
 
