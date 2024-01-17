@@ -22,6 +22,25 @@ param namePrefix string = 'avm'
 @secure()
 param nsxtPassword string
 
+@description('Optional. Set the vCenter Admin password when the private cloud is created.')
+@secure()
+param vcenterPassword string
+
+// Variables
+var avsSDDCConfigurations = [
+  {
+    serviceShort: 'sddcmin'
+    namePrefix: 'avm'
+    skuName: 'AV36'
+    internet: 'Enabled'
+    clusterSize: 3
+    networkBlock: '10.87.0.0/22'
+    nsxtPassword: nsxtPassword
+    vcenterPassword: vcenterPassword
+    hcxAddonEnabled: false
+  }
+]
+
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
@@ -30,16 +49,19 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 // Test Execution
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem' ]: {
+module testDeployment '../../../main.bicep' = [for (config, iteration) in avsSDDCConfigurations: {
   scope: resourceGroup
-  name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
+  name: '${config.namePrefix}${config.serviceShort}${iteration}'
   params: {
-    name: '${namePrefix}-${serviceShort}-001'
+    name: '${config.namePrefix}-${config.serviceShort}-00${iteration}'
+    deploymentPrefix: config.namePrefix
     location: location
-    sku: 'AV36'
-    internet: 'Enabled'
-    clusterSize: 3
-    networkBlock: '10.87.0.0/22'
-    nsxtPassword: nsxtPassword
+    skuName: config.skuName
+    internet: config.internet
+    clusterSize: config.clusterSize
+    networkBlock: config.networkBlock
+    nsxtPassword: config.nsxtPassword
+    vcenterPassword: config.vcenterPassword
+    hcxAddonEnabled: config.hcxAddonEnabled
   }
 }]

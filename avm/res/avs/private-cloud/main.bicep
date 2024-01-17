@@ -6,7 +6,14 @@ metadata owner = 'Azure/module-maintainers'
 param name string
 
 @description('Required. The private cloud SKU.')
-param sku string
+@allowed([
+  'AV36'
+  'AV36T'
+  'AV36P'
+  'AV36PT'
+  'AV52'
+])
+param skuName string
 
 @description('Required. The network block for the private cloud.')
 param networkBlock string
@@ -35,8 +42,29 @@ param clusterSize int
 @secure()
 param nsxtPassword string?
 
+@description('Optional. Set the vCenter Admin password when the private cloud is created.')
+@secure()
+param vcenterPassword string?
+
 @description('Optional. Resource tags.')
 param tags object?
+
+@description('Required. Modules prefix')
+param deploymentPrefix string
+
+@description('Required. Define if the HCX Addon will be deployed or not.')
+param hcxAddonEnabled bool = false
+
+@description('Required. Define if the SRM Addon will be deployed or not.')
+param srmAddonEnabled bool = false
+
+@description('Optional. License key for SRM, if SRM Addon is enabled.')
+param srmLicenseKey string = ''
+
+@description('Optional. Number of vSphere Replication Servers to be created if SRM Addon is enabled.')
+@minValue(1)
+@maxValue(10)
+param srmReplicationServersCount int = 1
 
 @description('Optional. Enable/Disable usage telemetry for module.')
 param enableTelemetry bool = true
@@ -79,24 +107,35 @@ resource avmTelemetry 'Microsoft.Resources/deployments@2023-07-01' = if (enableT
   }
 }
 
-resource privateCloud 'Microsoft.AVS/privateClouds@2022-05-01' = {
+resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' = {
   name: name
   location: location
   tags: tags
   sku: {
-    name: sku
+    name: skuName
   }
   identity: {
     type: identityType
   }
   properties: {
-    availability: {}
     networkBlock: networkBlock
     internet: internet
     managementCluster: {
       clusterSize: clusterSize
     }
     nsxtPassword: nsxtPassword
+    vcenterPassword: vcenterPassword
+  }
+}
+
+module addOns 'addons/AVSAddons.bicep' = {
+  name: '${deploymentPrefix}-addons'
+  params: {
+    privateCloudName: privateCloud.name
+    hcxAddonEnabled: hcxAddonEnabled
+    srmAddonEnabled: srmAddonEnabled
+    srmLicenseKey: srmLicenseKey
+    srmReplicationServersCount: srmReplicationServersCount
   }
 }
 
@@ -123,6 +162,12 @@ resource privateCloud_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@
         enabled: true
       }
     ]
+    logs: diagnosticSetting.?logCategoriesAndGroups ?? [
+      {
+        categoryGroup: 'AllLogs'
+        enabled: true
+      }
+    ]
     marketplacePartnerId: diagnosticSetting.?marketplacePartnerResourceId
     logAnalyticsDestinationType: diagnosticSetting.?logAnalyticsDestinationType
   }
@@ -145,10 +190,10 @@ resource privateCloud_RoleAssignments 'Microsoft.Authorization/roleAssignments@2
 
 // Outputs
 @description('The name of the deployed resource.')
-output name string = privateCloud.name
+output privateCloudName string = privateCloud.name
 
 @description('The resource ID of the deployed resource.')
-output resourceId string = privateCloud.id
+output privateCloudResourceId string = privateCloud.id
 
 @description('The resource group of the deployed resource.')
 output resourceGroupName string = resourceGroup().name

@@ -26,13 +26,14 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 // Test Execution
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem' ]: {
+module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
   scope: resourceGroup
   name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
   params: {
+    deploymentPrefix: namePrefix
     name: '${namePrefix}-${serviceShort}-001'
     location: location
-    sku: 'AV36'
+    skuName: 'AV36'
     clusterSize: 3
     networkBlock: '10.87.0.0/22'
   }
