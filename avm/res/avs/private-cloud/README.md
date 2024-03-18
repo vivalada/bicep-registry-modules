@@ -370,84 +370,54 @@ module expressRouteCircuit 'br/public:avm/res/network/express-route-circuit:<ver
 
 ## Parameters
 
-**Required parameters**
+### Required parameters
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`name`](#parameter-name) | string | This is the name of the AVS Private Cloud. |
-| [`skuName`](#parameter-skuname) | string | This is the AVS Private Cloud SKU name. |
-| [`clusterSize`](#parameter-clustersize) | int | This is the number of hosts in the cluster. |
-| [`networkBlock`](#parameter-networkblock) | string | This is the network block for the AVS Private Cloud. |
+| [`name`](#parameter-name) | string | The AVS Private Cloud name. |
+| [`skuName`](#parameter-skuname) | string | The AVS Private Cloud SKU name. |
+| [`clusterSize`](#parameter-clustersize) | int | The management cluster size. |
+| [`networkBlock`](#parameter-networkblock) | string | The network block for the AVS Private Cloud. |
 
-**Optional parameters**
+#### Parameter: `name`
+
+The AVS Private Cloud name.
+
+- Required: Yes
+- Type: string
+
+#### Parameter: `skuName`
+
+The AVS Private Cloud SKU name.
+
+- Required: Yes
+- Type: string
+
+#### Parameter: `clusterSize`
+
+The management cluster size.
+
+- Required: Yes
+- Type: int
+
+#### Parameter: `networkBlock`
+
+The network block for the AVS Private Cloud.
+
+- Required: Yes
+- Type: string
+
+### Optional parameters
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
+| [`location`](#parameter-location) | string | Location for all resources. |
 | [`identityType`](#parameter-identitytype) | string | The type of identity used for the private cloud. The type 'SystemAssigned' refers to an implicitly created identity. The type 'None' will remove any identities from the Private Cloud. |
+| [`internet`](#parameter-internet) | string | The internet access configuration. |
 | [`nsxtPassword`](#parameter-nsxtpassword) | securestring | Set the NSX-T Manager password when the private cloud is created. |
 | [`vcenterPassword`](#parameter-vcenterpassword) | securestring | Set the vCenter admin password when the private cloud is created. |
-| [`diagnosticSettings`](#parameter-diagnosticsettings) | array | The diagnostic settings of the service. |
-| [`enableTelemetry`](#parameter-enabletelemetry) | bool | Enable telemetry via a Globally Unique Identifier (GUID). |
-| [`location`](#parameter-location) | string | Location for all resources. |
-| [`lock`](#parameter-lock) | object | The lock settings of the service. |
-| [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
 | [`tags`](#parameter-tags) | object | Tags of the resource. |
-
-### Parameter: `bandwidthInMbps`
-
-This is the bandwidth in Mbps of the circuit being created. It must exactly match one of the available bandwidth offers List ExpressRoute Service Providers API call.
-
-- Required: Yes
-- Type: int
-
-### Parameter: `name`
-
-This is the name of the ExpressRoute circuit.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `peeringLocation`
-
-This is the name of the peering location and not the ARM resource location. It must exactly match one of the available peering locations from List ExpressRoute Service Providers API call.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `serviceProviderName`
-
-This is the name of the ExpressRoute Service Provider. It must exactly match one of the Service Providers from List ExpressRoute Service Providers API call.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `allowClassicOperations`
-
-Allow classic operations. You can connect to virtual networks in the classic deployment model by setting allowClassicOperations to true.
-
-- Required: No
-- Type: bool
-- Default: `False`
-
-### Parameter: `bandwidthInGbps`
-
-The bandwidth of the circuit when the circuit is provisioned on an ExpressRoutePort resource. Available when configuring Express Route Direct. Default value of 0 will set the property to null.
-
-- Required: No
-- Type: int
-- Default: `0`
-
-### Parameter: `diagnosticSettings`
-
-The diagnostic settings of the service.
-
-- Required: No
-- Type: array
-
-**Optional parameters**
-
-| Parameter | Type | Description |
-| :-- | :-- | :-- |
+| [`diagnosticSettings`](#parameter-diagnosticsettings) | array | The diagnostic settings of the service. |
 | [`eventHubAuthorizationRuleResourceId`](#parameter-diagnosticsettingseventhubauthorizationruleresourceid) | string | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
 | [`eventHubName`](#parameter-diagnosticsettingseventhubname) | string | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub. |
 | [`logAnalyticsDestinationType`](#parameter-diagnosticsettingsloganalyticsdestinationtype) | string | A string indicating whether the export to Log Analytics should use the default destination type, i.e. AzureDiagnostics, or use a destination type. |
@@ -457,22 +427,91 @@ The diagnostic settings of the service.
 | [`name`](#parameter-diagnosticsettingsname) | string | The name of diagnostic setting. |
 | [`storageAccountResourceId`](#parameter-diagnosticsettingsstorageaccountresourceid) | string | Resource ID of the diagnostic storage account. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub. |
 | [`workspaceResourceId`](#parameter-diagnosticsettingsworkspaceresourceid) | string | Resource ID of the diagnostic log analytics workspace. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub. |
+| [`enableTelemetry`](#parameter-enabletelemetry) | bool | Enable telemetry via a Globally Unique Identifier (GUID). |
+| [`lock`](#parameter-lock) | object | The lock settings of the service. |
+| [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
 
-### Parameter: `diagnosticSettings.eventHubAuthorizationRuleResourceId`
+#### Parameter: `location`
+
+Location for all resources.
+
+- Required: No
+- Type: string
+- Default: `[resourceGroup().location]`
+
+#### Parameter: `identityType`
+
+The type of identity used for the private cloud. The type 'SystemAssigned' refers to an implicitly created identity. The type 'None' will remove any identities from the Private Cloud.
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'None'
+    'SystemAssigned'
+  ]
+  ```
+- Default: `None`
+
+#### Parameter: `internet`
+
+The internet access configuration.
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
+- Default: `Disabled`
+
+#### Parameter: `nsxtPassword`
+
+Set the NSX-T Manager password when the private cloud is created.
+
+- Required: No
+- Type: securestring
+
+#### Parameter: `vcenterPassword`
+
+Set the vCenter admin password when the private cloud is created.
+
+- Required: No
+- Type: securestring
+
+#### Parameter: `tags`
+
+Tags of the resource.
+
+- Required: No
+- Type: object
+
+#### Parameter: `diagnosticSettings`
+
+The diagnostic settings of the service.
+
+- Required: No
+- Type: array
+
+#### Parameter: `diagnosticSettings.eventHubAuthorizationRuleResourceId`
 
 Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to.
 
 - Required: No
 - Type: string
 
-### Parameter: `diagnosticSettings.eventHubName`
+#### Parameter: `diagnosticSettings.eventHubName`
 
 Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.
 
 - Required: No
 - Type: string
 
-### Parameter: `diagnosticSettings.logAnalyticsDestinationType`
+#### Parameter: `diagnosticSettings.logAnalyticsDestinationType`
 
 A string indicating whether the export to Log Analytics should use the default destination type, i.e. AzureDiagnostics, or use a destination type.
 
@@ -486,49 +525,49 @@ A string indicating whether the export to Log Analytics should use the default d
   ]
   ```
 
-### Parameter: `diagnosticSettings.logCategoriesAndGroups`
+#### Parameter: `diagnosticSettings.logCategoriesAndGroups`
 
 The name of logs that will be streamed. "allLogs" includes all possible logs for the resource. Set to '' to disable log collection.
 
 - Required: No
 - Type: array
 
-### Parameter: `diagnosticSettings.marketplacePartnerResourceId`
+#### Parameter: `diagnosticSettings.marketplacePartnerResourceId`
 
 The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.
 
 - Required: No
 - Type: string
 
-### Parameter: `diagnosticSettings.metricCategories`
+#### Parameter: `diagnosticSettings.metricCategories`
 
 The name of logs that will be streamed. "allLogs" includes all possible logs for the resource. Set to '' to disable log collection.
 
 - Required: No
 - Type: array
 
-### Parameter: `diagnosticSettings.name`
+#### Parameter: `diagnosticSettings.name`
 
 The name of diagnostic setting.
 
 - Required: No
 - Type: string
 
-### Parameter: `diagnosticSettings.storageAccountResourceId`
+#### Parameter: `diagnosticSettings.storageAccountResourceId`
 
 Resource ID of the diagnostic storage account. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.
 
 - Required: No
 - Type: string
 
-### Parameter: `diagnosticSettings.workspaceResourceId`
+#### Parameter: `diagnosticSettings.workspaceResourceId`
 
 Resource ID of the diagnostic log analytics workspace. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.
 
 - Required: No
 - Type: string
 
-### Parameter: `enableTelemetry`
+#### Parameter: `enableTelemetry`
 
 Enable telemetry via a Globally Unique Identifier (GUID).
 
@@ -536,31 +575,7 @@ Enable telemetry via a Globally Unique Identifier (GUID).
 - Type: bool
 - Default: `True`
 
-### Parameter: `expressRoutePortResourceId`
-
-The reference to the ExpressRoutePort resource when the circuit is provisioned on an ExpressRoutePort resource. Available when configuring Express Route Direct.
-
-- Required: No
-- Type: string
-- Default: `''`
-
-### Parameter: `globalReachEnabled`
-
-Flag denoting global reach status. To enable ExpressRoute Global Reach between different geopolitical regions, your circuits must be Premium SKU.
-
-- Required: No
-- Type: bool
-- Default: `False`
-
-### Parameter: `location`
-
-Location for all resources.
-
-- Required: No
-- Type: string
-- Default: `[resourceGroup().location]`
-
-### Parameter: `lock`
+#### Parameter: `lock`
 
 The lock settings of the service.
 
@@ -574,7 +589,7 @@ The lock settings of the service.
 | [`kind`](#parameter-lockkind) | string | Specify the type of lock. |
 | [`name`](#parameter-lockname) | string | Specify the name of lock. |
 
-### Parameter: `lock.kind`
+#### Parameter: `lock.kind`
 
 Specify the type of lock.
 
@@ -589,53 +604,14 @@ Specify the type of lock.
   ]
   ```
 
-### Parameter: `lock.name`
+#### Parameter: `lock.name`
 
 Specify the name of lock.
 
 - Required: No
 - Type: string
 
-### Parameter: `peerASN`
-
-The autonomous system number of the customer/connectivity provider.
-
-- Required: No
-- Type: int
-- Default: `0`
-
-### Parameter: `peering`
-
-Enabled BGP peering type for the Circuit.
-
-- Required: No
-- Type: bool
-- Default: `False`
-
-### Parameter: `peeringType`
-
-BGP peering type for the Circuit. Choose from AzurePrivatePeering, AzurePublicPeering or MicrosoftPeering.
-
-- Required: No
-- Type: string
-- Default: `'AzurePrivatePeering'`
-- Allowed:
-  ```Bicep
-  [
-    'AzurePrivatePeering'
-    'MicrosoftPeering'
-  ]
-  ```
-
-### Parameter: `primaryPeerAddressPrefix`
-
-A /30 subnet used to configure IP addresses for interfaces on Link1.
-
-- Required: No
-- Type: string
-- Default: `''`
-
-### Parameter: `roleAssignments`
+#### Parameter: `roleAssignments`
 
 Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'.
 
@@ -659,28 +635,28 @@ Array of role assignment objects that contain the 'roleDefinitionIdOrName' and '
 | [`description`](#parameter-roleassignmentsdescription) | string | The description of the role assignment. |
 | [`principalType`](#parameter-roleassignmentsprincipaltype) | string | The principal type of the assigned principal ID. |
 
-### Parameter: `roleAssignments.principalId`
+#### Parameter: `roleAssignments.principalId`
 
 The principal ID of the principal (user/group/identity) to assign the role to.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `roleAssignments.roleDefinitionIdOrName`
+#### Parameter: `roleAssignments.roleDefinitionIdOrName`
 
 The name of the role to assign. If it cannot be found you can specify the role definition ID instead.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `roleAssignments.condition`
+#### Parameter: `roleAssignments.condition`
 
 The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container"
 
 - Required: No
 - Type: string
 
-### Parameter: `roleAssignments.conditionVersion`
+#### Parameter: `roleAssignments.conditionVersion`
 
 Version of the condition.
 
@@ -693,21 +669,21 @@ Version of the condition.
   ]
   ```
 
-### Parameter: `roleAssignments.delegatedManagedIdentityResourceId`
+#### Parameter: `roleAssignments.delegatedManagedIdentityResourceId`
 
 The Resource Id of the delegated managed identity resource.
 
 - Required: No
 - Type: string
 
-### Parameter: `roleAssignments.description`
+#### Parameter: `roleAssignments.description`
 
 The description of the role assignment.
 
 - Required: No
 - Type: string
 
-### Parameter: `roleAssignments.principalType`
+#### Parameter: `roleAssignments.principalType`
 
 The principal type of the assigned principal ID.
 
@@ -724,79 +700,19 @@ The principal type of the assigned principal ID.
   ]
   ```
 
-### Parameter: `secondaryPeerAddressPrefix`
-
-A /30 subnet used to configure IP addresses for interfaces on Link2.
-
-- Required: No
-- Type: string
-- Default: `''`
-
-### Parameter: `sharedKey`
-
-The shared key for peering configuration. Router does MD5 hash comparison to validate the packets sent by BGP connection. This parameter is optional and can be removed from peering configuration if not required.
-
-- Required: No
-- Type: securestring
-- Default: `''`
-
-### Parameter: `skuFamily`
-
-Chosen SKU family of ExpressRoute circuit. Choose from MeteredData or UnlimitedData SKU families.
-
-- Required: No
-- Type: string
-- Default: `'MeteredData'`
-- Allowed:
-  ```Bicep
-  [
-    'MeteredData'
-    'UnlimitedData'
-  ]
-  ```
-
-### Parameter: `skuTier`
-
-Chosen SKU Tier of ExpressRoute circuit. Choose from Local, Premium or Standard SKU tiers.
-
-- Required: No
-- Type: string
-- Default: `'Standard'`
-- Allowed:
-  ```Bicep
-  [
-    'Local'
-    'Premium'
-    'Standard'
-  ]
-  ```
-
-### Parameter: `tags`
-
-Tags of the resource.
-
-- Required: No
-- Type: object
-
-### Parameter: `vlanId`
-
-Specifies the identifier that is used to identify the customer.
-
-- Required: No
-- Type: int
-- Default: `0`
-
-
 ## Outputs
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
-| `location` | string | The location the resource was deployed into. |
-| `name` | string | The name of express route curcuit. |
+| `privateCloudName` | string | The name of the private cloud. |
+| `privateCloudResourceId` | string | The resource ID of the private cloud. |
 | `resourceGroupName` | string | The resource group the express route curcuit was deployed into. |
-| `resourceId` | string | The resource ID of express route curcuit. |
-| `serviceKey` | string | The service key of the express route circuit. |
+| `location` | string | The location the resource was deployed into. |
 
 ## Cross-referenced modules
 
 _None_
+
+## Data Collection
+
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the [repository](https://aka.ms/avm/telemetry). There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.

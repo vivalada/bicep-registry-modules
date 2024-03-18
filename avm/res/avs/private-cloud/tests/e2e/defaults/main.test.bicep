@@ -35,6 +35,6 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
     location: location
     skuName: 'AV36'
     clusterSize: 3
-    networkBlock: '10.87.0.0/22'
+    networkBlock: '10.34.0.0/22'
   }
 }]

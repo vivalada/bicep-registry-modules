@@ -5,7 +5,7 @@ metadata owner = 'Azure/module-maintainers'
 @description('Required. The AVS Private Cloud name.')
 param name string
 
-@description('Required. The private cloud SKU.')
+@description('Required. The AVS Private Cloud SKU name.')
 @allowed([
   'AV36'
   'AV36T'
@@ -15,7 +15,12 @@ param name string
 ])
 param skuName string
 
-@description('Required. The network block for the private cloud.')
+@description('Required. The management cluster size.')
+@minValue(3)
+@maxValue(16)
+param clusterSize int
+
+@description('Required. The network block for the AVS Private Cloud.')
 param networkBlock string
 
 @description('Optional. Location for all resources.')
@@ -35,19 +40,13 @@ param identityType string = 'None'
 ])
 param internet string = 'Disabled'
 
-@description('Optional. The management cluster size.')
-param clusterSize int
-
-@description('Optional. Set the NSX-T Manager password when the private cloud is created.')
+@description('Optional. The password value to use for the cloudadmin account password in the local domain in NSX-T. If this is left as null a random password will be generated for the deployment.')
 @secure()
 param nsxtPassword string?
 
-@description('Optional. Set the vCenter Admin password when the private cloud is created.')
+@description('Optional. The password value to use for the cloudadmin account password in the local domain in vCenter. If this is left as null a random password will be generated for the deployment.')
 @secure()
 param vcenterPassword string?
-
-@description('Optional. Resource tags.')
-param tags object?
 
 @description('Required. Modules prefix')
 param deploymentPrefix string
@@ -58,13 +57,16 @@ param hcxAddonEnabled bool = false
 @description('Required. Define if the SRM Addon will be deployed or not.')
 param srmAddonEnabled bool = false
 
-@description('Optional. License key for SRM, if SRM Addon is enabled.')
+@description('Conditional. Required if SRM Addon is enabled. License key for SRM.')
 param srmLicenseKey string = ''
 
-@description('Optional. Number of vSphere Replication Servers to be created if SRM Addon is enabled.')
+@description('Conditional. Required if SRM Addon is enabled. Number of vSphere Replication Servers to be created.')
 @minValue(1)
 @maxValue(10)
 param srmReplicationServersCount int = 1
+
+@description('Optional. Resource tags.')
+param tags object?
 
 @description('Optional. Enable/Disable usage telemetry for module.')
 param enableTelemetry bool = true
@@ -79,6 +81,24 @@ param diagnosticSettings diagnosticSettingType
 param roleAssignments roleAssignmentType
 
 // Variables
+var privateCloudStandardProperties = {
+  networkBlock: networkBlock
+  internet: internet
+  managementCluster: {
+    clusterSize: clusterSize
+  }
+}
+
+var privateCloudProperties = union(
+  privateCloudStandardProperties,
+  !empty(nsxtPassword) ? {
+    nsxtPassword: nsxtPassword
+  } : {},
+  !empty(vcenterPassword) ? {
+    vcenterPassword: vcenterPassword
+  } : {}
+)
+
 var builtInRoleNames = {
   // Add other relevant built-in roles here for your resource as per BCPNFR5
   Contributor: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
@@ -112,20 +132,12 @@ resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' = {
   location: location
   tags: tags
   sku: {
-    name: skuName
+    name: toLower(skuName)
   }
   identity: {
     type: identityType
   }
-  properties: {
-    networkBlock: networkBlock
-    internet: internet
-    managementCluster: {
-      clusterSize: clusterSize
-    }
-    nsxtPassword: nsxtPassword
-    vcenterPassword: vcenterPassword
-  }
+  properties: privateCloudProperties
 }
 
 module addOns 'addons/AVSAddons.bicep' = {

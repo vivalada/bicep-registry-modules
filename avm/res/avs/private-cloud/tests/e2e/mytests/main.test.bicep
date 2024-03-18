@@ -31,7 +31,7 @@ var avsSDDCConfigurations = [
   {
     serviceShort: 'sddcmin'
     namePrefix: 'avm'
-    skuName: 'AV36'
+    skuName: 'AV36P'
     internet: 'Enabled'
     clusterSize: 3
     networkBlock: '10.87.0.0/22'
