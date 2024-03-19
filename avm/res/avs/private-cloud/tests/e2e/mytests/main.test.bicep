@@ -32,7 +32,7 @@ var avsSDDCConfigurations = [
     serviceShort: 'sddcmin'
     namePrefix: 'avm'
     skuName: 'AV36P'
-    internet: 'Enabled'
+    internetEnabled: true
     clusterSize: 3
     networkBlock: '10.87.0.0/22'
     nsxtPassword: nsxtPassword
@@ -57,7 +57,7 @@ module testDeployment '../../../main.bicep' = [for (config, iteration) in avsSDD
     deploymentPrefix: config.namePrefix
     location: location
     skuName: config.skuName
-    internet: config.internet
+    internetEnabled: config.internetEnabled
     clusterSize: config.clusterSize
     networkBlock: config.networkBlock
     nsxtPassword: config.nsxtPassword

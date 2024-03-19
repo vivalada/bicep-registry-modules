@@ -34,11 +34,16 @@ param location string = resourceGroup().location
 param identityType string = 'None'
 
 @description('Optional. The internet access configuration.')
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-param internet string = 'Disabled'
+param internetEnabled bool = false
+
+@description('Required. Set this value to true if deploying an AVS stretch cluster.')
+param stretchClusterEnabled bool = false
+
+@description('Optional. This value represents the zone for deployment in a standard deployment or the primary zone in a stretch cluster deployment. Defaults to null to let Azure select the zone.')
+param primaryZone int = 0
+
+@description('Conditional. Required if it is a stretched cluster deployment. This value represents the secondary zone in a stretched cluster deployment.')
+param secondaryZone int?
 
 @description('Optional. The password value to use for the cloudadmin account password in the local domain in NSX-T. If this is left as null a random password will be generated for the deployment.')
 @secure()
@@ -83,9 +88,14 @@ param roleAssignments roleAssignmentType
 // Variables
 var privateCloudStandardProperties = {
   networkBlock: networkBlock
-  internet: internet
+  internet: internetEnabled ? 'Enabled' : 'Disabled'
   managementCluster: {
     clusterSize: clusterSize
+  }
+  availability: {
+    secondaryZone: stretchClusterEnabled ? null : secondaryZone
+    zone: ((primaryZone == 0) ? null : primaryZone)
+    strategy: stretchClusterEnabled ? 'DualZone' : 'SingleZone'
   }
 }
 

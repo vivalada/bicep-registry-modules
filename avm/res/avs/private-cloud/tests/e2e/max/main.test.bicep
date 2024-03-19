@@ -18,6 +18,18 @@ param serviceShort string = 'sddcmax'
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
 
+@description('Optional. The internet access configuration.')
+param internetEnabled bool = true
+
+@description('Required. Set this value to true if deploying an AVS stretch cluster.')
+param stretchClusterEnabled bool = true
+
+@description('Optional. This value represents the zone for deployment in a standard deployment or the primary zone in a stretch cluster deployment. Defaults to null to let Azure select the zone.')
+param primaryZone int = 1
+
+@description('Conditional. Required if it is a stretched cluster deployment. This value represents the secondary zone in a stretched cluster deployment.')
+param secondaryZone int = 2
+
 @description('Optional. The identity of the private cloud, if configured.')
 param identityType string = 'SystemAssigned'
 
@@ -68,6 +80,10 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
     skuName: 'AV36P'
     clusterSize: 3
     networkBlock: '10.64.0.0/22'
+    internetEnabled: internetEnabled
+    stretchClusterEnabled: stretchClusterEnabled
+    primaryZone: primaryZone
+    secondaryZone: secondaryZone
     identityType: identityType
     nsxtPassword: nsxtPassword
     vcenterPassword: vcenterPassword
