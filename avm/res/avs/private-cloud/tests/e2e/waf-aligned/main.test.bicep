@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
-metadata name = 'WAF-aligned'
-metadata description = 'This instance deploys the module in alignment with the best-practices of the Well-Architected Framework.'
+metadata name = 'Using large parameter set'
+metadata description = 'This instance deploys the module with most of its features enabled.'
 
 // Parameters
 
@@ -17,6 +17,17 @@ param serviceShort string = 'sddcwaf'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
+
+@description('Optional. The identity of the private cloud, if configured.')
+param identityType string = 'SystemAssigned'
+
+@description('Optional. Set the NSX-T Manager password when the private cloud is created.')
+@secure()
+param nsxtPassword string
+
+@description('Optional. Set the vCenter Admin password when the private cloud is created.')
+@secure()
+param vcenterPassword string
 
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -57,6 +68,13 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
     skuName: 'AV36P'
     clusterSize: 3
     networkBlock: '10.64.0.0/22'
+    internetEnabled: false
+    stretchClusterEnabled: false
+    //primaryZone: 1
+    //secondaryZone: 2
+    identityType: identityType
+    nsxtPassword: nsxtPassword
+    vcenterPassword: vcenterPassword
     diagnosticSettings: [
       {
         name: 'diag-avm-01'
