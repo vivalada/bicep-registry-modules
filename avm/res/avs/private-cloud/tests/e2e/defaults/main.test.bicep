@@ -13,7 +13,7 @@ param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceSh
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'sddcmin'
+param serviceShort string = 'sddcdef'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
@@ -26,15 +26,16 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 // Test Execution
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
-  scope: resourceGroup
-  name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
-  params: {
-    deploymentPrefix: namePrefix
-    name: '${namePrefix}-${serviceShort}-001'
-    location: location
-    skuName: 'AV36'
-    clusterSize: 3
-    networkBlock: '10.34.0.0/22'
+module testPrivateCloud '../../../main.bicep' = [
+  for iteration in ['init']: {
+    scope: resourceGroup
+    name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
+    params: {
+      name: '${namePrefix}-${serviceShort}-001'
+      location: location
+      skuName: 'AV36P'
+      clusterSize: 3
+      networkBlock: '10.34.0.0/22'
+    }
   }
-}]
+]

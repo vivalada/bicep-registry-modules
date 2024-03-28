@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
-metadata name = 'Using only defaults'
-metadata description = 'This instance deploys the module with the minimum set of required parameters.'
+metadata name = 'Deployment of a private cloud and its dependencies for a full environment'
+metadata description = 'This instance deploys the module with most of its features enabled, and other resources needed to use an AVS Private Cloud.'
 
 // Parameters
 
@@ -13,33 +13,13 @@ param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceSh
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'sddcmin'
+param serviceShort string = 'sddctst'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
 
-@description('Optional. Set the NSX-T Manager password when the private cloud is created.')
-@secure()
-param nsxtPassword string
-
-@description('Optional. Set the vCenter Admin password when the private cloud is created.')
-@secure()
-param vcenterPassword string
-
-// Variables
-var avsSDDCConfigurations = [
-  {
-    serviceShort: 'sddcmin'
-    namePrefix: 'avm'
-    skuName: 'AV36P'
-    internetEnabled: true
-    clusterSize: 3
-    networkBlock: '10.87.0.0/22'
-    nsxtPassword: nsxtPassword
-    vcenterPassword: vcenterPassword
-    hcxAddonEnabled: false
-  }
-]
+@description('Optional. The identity of the private cloud, if configured.')
+param identityType string = 'SystemAssigned'
 
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -47,21 +27,83 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
+module nestedDependencies 'dependencies.bicep' = {
+  scope: resourceGroup
+  name: '${uniqueString(deployment().name, location)}-nestedDependencies'
+  params: {
+    managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
+    natGatewayPublicIPName: '${namePrefix}-${serviceShort}-natgw-ip'
+    natGatewayName: '${namePrefix}-${serviceShort}-natgw'
+    gatewayVNetName: '${namePrefix}-${serviceShort}-gwvnet'
+    gatewayPublicIPName: '${namePrefix}-${serviceShort}-gw-ip'
+    gatewayName: '${namePrefix}-${serviceShort}-gw'
+    keyVaultName: '${namePrefix}-${serviceShort}-kv'
+    location: location
+  }
+}
+
+module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/templates/diagnostic.dependencies.bicep' = {
+  scope: resourceGroup
+  name: '${uniqueString(deployment().name, location)}-diagnosticDependencies'
+  params: {
+    storageAccountName: 'dep${namePrefix}diasa${serviceShort}01'
+    logAnalyticsWorkspaceName: 'dep-${namePrefix}-law-${serviceShort}'
+    eventHubNamespaceEventHubName: 'dep-${namePrefix}-evh-${serviceShort}'
+    eventHubNamespaceName: 'dep-${namePrefix}-evhns-${serviceShort}'
+    location: location
+  }
+}
+
 // Test Execution
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for (config, iteration) in avsSDDCConfigurations: {
-  scope: resourceGroup
-  name: '${config.namePrefix}${config.serviceShort}${iteration}'
-  params: {
-    name: '${config.namePrefix}-${config.serviceShort}-00${iteration}'
-    deploymentPrefix: config.namePrefix
-    location: location
-    skuName: config.skuName
-    internetEnabled: config.internetEnabled
-    clusterSize: config.clusterSize
-    networkBlock: config.networkBlock
-    nsxtPassword: config.nsxtPassword
-    vcenterPassword: config.vcenterPassword
-    hcxAddonEnabled: config.hcxAddonEnabled
+module testDeployment '../../../main.bicep' = [
+  for iteration in ['init']: {
+    scope: resourceGroup
+    name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
+    params: {
+      enableTelemetry: true
+      name: '${namePrefix}-${serviceShort}-001'
+      location: location
+      skuName: 'AV36P'
+      clusterSize: 3
+      networkBlock: '10.42.0.0/22'
+      internetEnabled: false
+      stretchClusterEnabled: false
+      identityType: identityType
+      diagnosticSettings: [
+        {
+          name: 'diag-avm-01'
+          metricCategories: [
+            {
+              category: 'AllMetrics'
+            }
+          ]
+          eventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
+          eventHubAuthorizationRuleResourceId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
+          storageAccountResourceId: diagnosticDependencies.outputs.storageAccountResourceId
+          workspaceResourceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
+        }
+      ]
+      lock: {
+        kind: 'CanNotDelete'
+        name: 'myLockName'
+      }
+      roleAssignments: [
+        {
+          roleDefinitionIdOrName: 'Contributor'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+      ]
+      tags: {
+        Environment: 'AVS'
+        Source: 'AVM'
+        TestType: 'Full'
+      }
+    }
+    dependsOn: [
+      nestedDependencies
+      diagnosticDependencies
+    ]
   }
-}]
+]

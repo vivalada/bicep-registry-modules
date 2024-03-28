@@ -58,56 +58,55 @@ module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/t
 
 // Test Execution
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init' ]: {
-  scope: resourceGroup
-  name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
-  params: {
-    deploymentPrefix: namePrefix
-    name: '${namePrefix}-${serviceShort}-001'
-    location: location
-    skuName: 'AV36P'
-    clusterSize: 3
-    networkBlock: '10.64.0.0/22'
-    internetEnabled: false
-    stretchClusterEnabled: false
-    //primaryZone: 1
-    //secondaryZone: 2
-    identityType: identityType
-    nsxtPassword: nsxtPassword
-    vcenterPassword: vcenterPassword
-    diagnosticSettings: [
-      {
-        name: 'diag-avm-01'
-        metricCategories: [
-          {
-            category: 'AllMetrics'
-          }
-        ]
-        eventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
-        eventHubAuthorizationRuleResourceId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
-        storageAccountResourceId: diagnosticDependencies.outputs.storageAccountResourceId
-        workspaceResourceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
+module testPrivateCloud '../../../main.bicep' = [
+  for iteration in ['init']: {
+    scope: resourceGroup
+    name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'
+    params: {
+      name: '${namePrefix}-${serviceShort}-001'
+      location: location
+      skuName: 'AV36P'
+      clusterSize: 6
+      networkBlock: '10.53.0.0/22'
+      internetEnabled: false
+      stretchClusterEnabled: true
+      identityType: identityType
+      nsxtPassword: nsxtPassword
+      vcenterPassword: vcenterPassword
+      diagnosticSettings: [
+        {
+          name: 'diag-avm-01'
+          metricCategories: [
+            {
+              category: 'AllMetrics'
+            }
+          ]
+          eventHubName: diagnosticDependencies.outputs.eventHubNamespaceEventHubName
+          eventHubAuthorizationRuleResourceId: diagnosticDependencies.outputs.eventHubAuthorizationRuleId
+          storageAccountResourceId: diagnosticDependencies.outputs.storageAccountResourceId
+          workspaceResourceId: diagnosticDependencies.outputs.logAnalyticsWorkspaceResourceId
+        }
+      ]
+      lock: {
+        kind: 'CanNotDelete'
+        name: 'myLockName'
       }
-    ]
-    lock: {
-      kind: 'CanNotDelete'
-      name: 'myLockName'
-    }
-    roleAssignments: [
-      {
-        roleDefinitionIdOrName: 'Contributor'
-        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-        principalType: 'ServicePrincipal'
+      roleAssignments: [
+        {
+          roleDefinitionIdOrName: 'Contributor'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+      ]
+      tags: {
+        Environment: 'Test'
+        Source: 'AVM'
+        TestType: 'Interfaces'
       }
-    ]
-    tags: {
-      Environment: 'Test'
-      Source: 'AVM'
-      TestType: 'Interfaces'
     }
+    dependsOn: [
+      nestedDependencies
+      diagnosticDependencies
+    ]
   }
-  dependsOn: [
-    nestedDependencies
-    diagnosticDependencies
-  ]
-}]
+]

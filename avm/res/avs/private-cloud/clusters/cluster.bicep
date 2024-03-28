@@ -17,6 +17,9 @@ param clusterName string
 ])
 param skuName string
 
+@description('Required. The number of nodes in the AVS Cluster.')
+param clusterSize int
+
 resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' existing = {
   name: privateCloudName
 }
@@ -28,7 +31,6 @@ resource cluster 'Microsoft.AVS/privateClouds/clusters@2023-03-01' = {
     name: skuName
   }
   properties: {
-    clusterSize: 3
-    hosts: []
+    clusterSize: clusterSize
   }
 }

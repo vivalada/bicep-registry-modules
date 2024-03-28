@@ -43,7 +43,7 @@ param stretchClusterEnabled bool = false
 param primaryZone int = 0
 
 @description('Conditional. Required if it is a stretched cluster deployment. This value represents the secondary zone in a stretched cluster deployment.')
-param secondaryZone int?
+param secondaryZone int = 0
 
 @description('Optional. The password value to use for the cloudadmin account password in the local domain in NSX-T. If this is left as null a random password will be generated for the deployment.')
 @secure()
@@ -53,11 +53,15 @@ param nsxtPassword string?
 @secure()
 param vcenterPassword string?
 
-@description('Required. Modules prefix')
-param deploymentPrefix string
-
 @description('Required. Define if the HCX Addon will be deployed or not.')
 param hcxAddonEnabled bool = false
+
+@description('Required. The HCX offer.')
+@allowed([
+  'VMware MaaS Cloud Provider (Enterprise)'
+  'VMware MaaS Cloud Provider'
+])
+param hcxOffer string = 'VMware MaaS Cloud Provider (Enterprise)'
 
 @description('Required. Define if the SRM Addon will be deployed or not.')
 param srmAddonEnabled bool = false
@@ -69,6 +73,12 @@ param srmLicenseKey string = ''
 @minValue(1)
 @maxValue(10)
 param srmReplicationServersCount int = 1
+
+@description('Required. Define if the ARC Addon will be deployed or not.')
+param arcAddonEnabled bool = false
+
+@description('Conditional. Required if ARC Addon is enabled. The VMware vCenter resource ID.')
+param vcenterResourceId string = ''
 
 @description('Optional. Resource tags.')
 param tags object?
@@ -93,7 +103,7 @@ var privateCloudStandardProperties = {
     clusterSize: clusterSize
   }
   availability: {
-    secondaryZone: stretchClusterEnabled ? null : secondaryZone
+    secondaryZone: ((secondaryZone == 0) ? null : secondaryZone)
     zone: ((primaryZone == 0) ? null : primaryZone)
     strategy: stretchClusterEnabled ? 'DualZone' : 'SingleZone'
   }
@@ -101,41 +111,54 @@ var privateCloudStandardProperties = {
 
 var privateCloudProperties = union(
   privateCloudStandardProperties,
-  !empty(nsxtPassword) ? {
-    nsxtPassword: nsxtPassword
-  } : {},
-  !empty(vcenterPassword) ? {
-    vcenterPassword: vcenterPassword
-  } : {}
+  !empty(nsxtPassword)
+    ? {
+        nsxtPassword: nsxtPassword
+      }
+    : {},
+  !empty(vcenterPassword)
+    ? {
+        vcenterPassword: vcenterPassword
+      }
+    : {}
 )
+
+var anyAddOnEnabled = hcxAddonEnabled || srmAddonEnabled || arcAddonEnabled ? true : false
 
 var builtInRoleNames = {
   // Add other relevant built-in roles here for your resource as per BCPNFR5
   Contributor: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
   Owner: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
   Reader: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
-  'Role Based Access Control Administrator (Preview)': subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f58310d9-a9f6-439a-9e8d-f62e7b41a168')
-  'User Access Administrator': subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')
+  'Role Based Access Control Administrator (Preview)': subscriptionResourceId(
+    'Microsoft.Authorization/roleDefinitions',
+    'f58310d9-a9f6-439a-9e8d-f62e7b41a168'
+  )
+  'User Access Administrator': subscriptionResourceId(
+    'Microsoft.Authorization/roleDefinitions',
+    '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9'
+  )
 }
 
 // Resources
-resource avmTelemetry 'Microsoft.Resources/deployments@2023-07-01' = if (enableTelemetry) {
-  name: '46d3xbcp.res.avs-privatecloud.${replace('-..--..-', '.', '-')}.${substring(uniqueString(deployment().name, location), 0, 4)}'
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
-      contentVersion: '1.0.0.0'
-      resources: []
-      outputs: {
-        telemetry: {
-          type: 'String'
-          value: 'For more information, see https://aka.ms/avm/TelemetryInfo'
+resource avmTelemetry 'Microsoft.Resources/deployments@2023-07-01' =
+  if (enableTelemetry) {
+    name: '46d3xbcp.res.avs-privatecloud.${replace('-..--..-', '.', '-')}.${substring(uniqueString(deployment().name, location), 0, 4)}'
+    properties: {
+      mode: 'Incremental'
+      template: {
+        '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+        contentVersion: '1.0.0.0'
+        resources: []
+        outputs: {
+          telemetry: {
+            type: 'String'
+            value: 'For more information, see https://aka.ms/avm/TelemetryInfo'
+          }
         }
       }
     }
   }
-}
 
 resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' = {
   name: name
@@ -150,65 +173,80 @@ resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' = {
   properties: privateCloudProperties
 }
 
-module addOns 'addons/AVSAddons.bicep' = {
-  name: '${deploymentPrefix}-addons'
-  params: {
-    privateCloudName: privateCloud.name
-    hcxAddonEnabled: hcxAddonEnabled
-    srmAddonEnabled: srmAddonEnabled
-    srmLicenseKey: srmLicenseKey
-    srmReplicationServersCount: srmReplicationServersCount
+module addOns 'addons/AVSAddons.bicep' =
+  if (anyAddOnEnabled) {
+    name: '${name}-addons'
+    params: {
+      privateCloudName: privateCloud.name
+      hcxAddonEnabled: hcxAddonEnabled
+      hcxOffer: hcxOffer
+      srmAddonEnabled: srmAddonEnabled
+      srmLicenseKey: srmLicenseKey
+      srmReplicationServersCount: srmReplicationServersCount
+      arcAddonEnabled: arcAddonEnabled
+      vcenterResourceId: vcenterResourceId
+    }
   }
-}
 
-resource privateCloud_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock ?? {}) && lock.?kind != 'None') {
-  name: lock.?name ?? 'lock-${name}'
-  properties: {
-    level: lock.?kind ?? ''
-    notes: lock.?kind == 'CanNotDelete' ? 'Cannot delete resource or child resources.' : 'Cannot delete or modify the resource or child resources.'
+resource privateCloud_lock 'Microsoft.Authorization/locks@2020-05-01' =
+  if (!empty(lock ?? {}) && lock.?kind != 'None') {
+    name: lock.?name ?? 'lock-${name}'
+    properties: {
+      level: lock.?kind ?? ''
+      notes: lock.?kind == 'CanNotDelete'
+        ? 'Cannot delete resource or child resources.'
+        : 'Cannot delete or modify the resource or child resources.'
+    }
+    scope: privateCloud
   }
-  scope: privateCloud
-}
 
-resource privateCloud_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = [for (diagnosticSetting, index) in (diagnosticSettings ?? []): {
-  name: diagnosticSetting.?name ?? '${name}-diagnosticSettings'
-  properties: {
-    storageAccountId: diagnosticSetting.?storageAccountResourceId
-    workspaceId: diagnosticSetting.?workspaceResourceId
-    eventHubAuthorizationRuleId: diagnosticSetting.?eventHubAuthorizationRuleResourceId
-    eventHubName: diagnosticSetting.?eventHubName
-    metrics: diagnosticSetting.?metricCategories ?? [
-      {
-        category: 'AllMetrics'
-        timeGrain: null
-        enabled: true
-      }
-    ]
-    logs: diagnosticSetting.?logCategoriesAndGroups ?? [
-      {
-        categoryGroup: 'AllLogs'
-        enabled: true
-      }
-    ]
-    marketplacePartnerId: diagnosticSetting.?marketplacePartnerResourceId
-    logAnalyticsDestinationType: diagnosticSetting.?logAnalyticsDestinationType
+resource privateCloud_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = [
+  for (diagnosticSetting, index) in (diagnosticSettings ?? []): {
+    name: diagnosticSetting.?name ?? '${name}-diagnosticSettings'
+    properties: {
+      storageAccountId: diagnosticSetting.?storageAccountResourceId
+      workspaceId: diagnosticSetting.?workspaceResourceId
+      eventHubAuthorizationRuleId: diagnosticSetting.?eventHubAuthorizationRuleResourceId
+      eventHubName: diagnosticSetting.?eventHubName
+      metrics: diagnosticSetting.?metricCategories ?? [
+        {
+          category: 'AllMetrics'
+          timeGrain: null
+          enabled: true
+        }
+      ]
+      logs: diagnosticSetting.?logCategoriesAndGroups ?? [
+        {
+          categoryGroup: 'AllLogs'
+          enabled: true
+        }
+      ]
+      marketplacePartnerId: diagnosticSetting.?marketplacePartnerResourceId
+      logAnalyticsDestinationType: diagnosticSetting.?logAnalyticsDestinationType
+    }
+    scope: privateCloud
   }
-  scope: privateCloud
-}]
+]
 
-resource privateCloud_RoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for (roleAssignment, index) in (roleAssignments ?? []): {
-  name: guid(privateCloud.id, roleAssignment.principalId, roleAssignment.roleDefinitionIdOrName)
-  properties: {
-    roleDefinitionId: contains(builtInRoleNames, roleAssignment.roleDefinitionIdOrName) ? builtInRoleNames[roleAssignment.roleDefinitionIdOrName] : contains(roleAssignment.roleDefinitionIdOrName, '/providers/Microsoft.Authorization/roleDefinitions/') ? roleAssignment.roleDefinitionIdOrName : subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignment.roleDefinitionIdOrName)
-    principalId: roleAssignment.principalId
-    description: roleAssignment.?description
-    principalType: roleAssignment.?principalType
-    condition: roleAssignment.?condition
-    conditionVersion: !empty(roleAssignment.?condition) ? (roleAssignment.?conditionVersion ?? '2.0') : null // Must only be set if condtion is set
-    delegatedManagedIdentityResourceId: roleAssignment.?delegatedManagedIdentityResourceId
+resource privateCloud_RoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for (roleAssignment, index) in (roleAssignments ?? []): {
+    name: guid(privateCloud.id, roleAssignment.principalId, roleAssignment.roleDefinitionIdOrName)
+    properties: {
+      roleDefinitionId: contains(builtInRoleNames, roleAssignment.roleDefinitionIdOrName)
+        ? builtInRoleNames[roleAssignment.roleDefinitionIdOrName]
+        : contains(roleAssignment.roleDefinitionIdOrName, '/providers/Microsoft.Authorization/roleDefinitions/')
+            ? roleAssignment.roleDefinitionIdOrName
+            : subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignment.roleDefinitionIdOrName)
+      principalId: roleAssignment.principalId
+      description: roleAssignment.?description
+      principalType: roleAssignment.?principalType
+      condition: roleAssignment.?condition
+      conditionVersion: !empty(roleAssignment.?condition) ? (roleAssignment.?conditionVersion ?? '2.0') : null // Must only be set if condtion is set
+      delegatedManagedIdentityResourceId: roleAssignment.?delegatedManagedIdentityResourceId
+    }
+    scope: privateCloud
   }
-  scope: privateCloud
-}]
+]
 
 // Outputs
 @description('The name of the deployed resource.')
