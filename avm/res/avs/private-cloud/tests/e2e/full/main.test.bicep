@@ -13,13 +13,17 @@ param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceSh
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'sddctst'
+param serviceShort string = 'sddcfull'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = 'avm'
 
 @description('Optional. The identity of the private cloud, if configured.')
 param identityType string = 'SystemAssigned'
+
+@description('Optional. The password value to use for the Jump VM Administrator account.')
+@secure()
+param jumpVMAdminPassword string
 
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -37,7 +41,16 @@ module nestedDependencies 'dependencies.bicep' = {
     gatewayVNetName: '${namePrefix}-${serviceShort}-gwvnet'
     gatewayPublicIPName: '${namePrefix}-${serviceShort}-gw-ip'
     gatewayName: '${namePrefix}-${serviceShort}-gw'
-    keyVaultName: '${namePrefix}-${serviceShort}-kv'
+    bastionPublicIPName: '${namePrefix}-${serviceShort}-bastion-ip'
+    bastionName: '${namePrefix}-${serviceShort}-bastion'
+    keyVaultName: '${namePrefix}-${serviceShort}-02-kv'
+    anfAccountName: '${namePrefix}-${serviceShort}-anfacc'
+    anfPoolName: '${namePrefix}-${serviceShort}-anfpool'
+    anfVolumeName: '${namePrefix}-${serviceShort}-anfvol'
+    jumpVMNICName: '${namePrefix}-${serviceShort}-jumpvm-nic'
+    jumpVMName: '${namePrefix}-${serviceShort}-jumpvm'
+    jumpVMAdminUsername: 'avsadmin'
+    jumpVMAdminPassword: jumpVMAdminPassword
     location: location
   }
 }
@@ -70,6 +83,11 @@ module testDeployment '../../../main.bicep' = [
       internetEnabled: false
       stretchClusterEnabled: false
       identityType: identityType
+      enablevNetConnectivity: true
+      gatewayName: nestedDependencies.outputs.gatewayName
+      authKeyName: '${namePrefix}-${serviceShort}-authkey'
+      connectionName: '${namePrefix}-${serviceShort}-conn'
+      hcxAddonEnabled: true
       diagnosticSettings: [
         {
           name: 'diag-avm-01'

@@ -80,6 +80,18 @@ param arcAddonEnabled bool = false
 @description('Conditional. Required if ARC Addon is enabled. The VMware vCenter resource ID.')
 param vcenterResourceId string = ''
 
+@description('Optional. Create vNet Connection.')
+param enablevNetConnectivity bool = false
+
+@description('Conditional. Required if vNet Connectivity is enabled. The name of the ExpressRoute Virtual Network Gateway of the customer Hub Network.')
+param gatewayName string = ''
+
+@description('Conditional. Required if vNet Connectivity is enabled. The name of the Authorization Key.')
+param authKeyName string = ''
+
+@description('Conditional. Required if vNet Connectivity is enabled. The name of the Connection.')
+param connectionName string = ''
+
 @description('Optional. Resource tags.')
 param tags object?
 
@@ -185,6 +197,18 @@ module addOns 'addons/AVSAddons.bicep' =
       srmReplicationServersCount: srmReplicationServersCount
       arcAddonEnabled: arcAddonEnabled
       vcenterResourceId: vcenterResourceId
+    }
+  }
+
+module vnetConnectivity 'connectivity/connectivity.bicep' =
+  if (enablevNetConnectivity) {
+    name: '${name}-vnetConnection'
+    params: {
+      privateCloudName: privateCloud.name
+      gatewayName: gatewayName
+      authKeyName: authKeyName
+      connectionName: connectionName
+      location: location
     }
   }
 

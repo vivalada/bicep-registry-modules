@@ -25,18 +25,19 @@ param vcenterResourceId string
 resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' existing = {
   name: privateCloudName
 }
-resource HCXAddOn 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
+
+resource HCX 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
   if (hcxAddonEnabled) {
-    name: 'HCX'
+    name: 'hcx'
     parent: privateCloud
     properties: {
       addonType: 'HCX'
       offer: hcxOffer
     }
   }
-resource srmAddOn 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
+resource SRM 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
   if (srmAddonEnabled) {
-    name: 'SRM'
+    name: 'srm'
     parent: privateCloud
     properties: {
       addonType: 'SRM'
@@ -44,20 +45,20 @@ resource srmAddOn 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
     }
   }
 
-resource vrAddOn 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
+resource VR 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
   if (srmAddonEnabled) {
-    name: 'VR'
+    name: 'vr'
     parent: privateCloud
     properties: {
       addonType: 'VR'
       vrsCount: srmReplicationServersCount
     }
     dependsOn: [
-      srmAddOn
+      SRM
     ]
   }
 
-resource arcAddOn 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
+resource Arc 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
   if (arcAddonEnabled) {
     name: 'Arc'
     parent: privateCloud
