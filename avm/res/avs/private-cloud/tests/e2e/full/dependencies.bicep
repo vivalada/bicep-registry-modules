@@ -249,6 +249,7 @@ resource anfVolume 'Microsoft.NetApp/netAppAccounts/capacityPools/volumes@2023-0
     subnetId: gatewayVNet.outputs.subnetResourceIds[3]
     usageThreshold: 2199023255552
     creationToken: 'avsVolume'
+    avsDataStore: 'Enabled'
     protocolTypes: [
       'NFSv3'
     ]
@@ -341,3 +342,24 @@ output gatewayResourceId string = gateway.id
 
 @description('The name of the created Virtual Network Gateway.')
 output gatewayName string = gateway.name
+
+@description('The resource ID of the created ANF Account.')
+output anfAccountResourceId string = anfAccount.id
+
+@description('The name of the created ANF Account.')
+output anfAccountName string = anfAccount.name
+
+@description('The resource ID of the created ANF Pool.')
+output anfPoolResourceId string = anfPool.id
+
+@description('The name of the created ANF Pool.')
+output anfPoolName string = anfPool.name
+
+@description('The resource ID of the created ANF Volume.')
+output anfVolumeResourceId string = anfVolume.id
+
+@description('The resource ID of the created Jump VM.')
+output jumpVMResourceId string = jumpVM.id
+
+@description('The name of the created Jump VM.')
+output jumpVMName string = jumpVM.name

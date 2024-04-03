@@ -92,6 +92,18 @@ param authKeyName string = ''
 @description('Conditional. Required if vNet Connectivity is enabled. The name of the Connection.')
 param connectionName string = ''
 
+@description('Optional. Add NetApp Volume.')
+param addNetAppVolume bool = false
+
+@description('Conditional. Required if Add NetApp Volume is enabled. The name of the NetApp Datastore.')
+param netAppDatastoreName string = ''
+
+@description('Conditional. Required if Add NetApp Volume is enabled. The NetApp Volume ID.')
+param netAppVolumeId string = ''
+
+@description('Conditional. Required if Add NetApp Volume is enabled. The name of the private cloud cluster.')
+param privateCloudClusterName string = ''
+
 @description('Optional. Resource tags.')
 param tags object?
 
@@ -209,6 +221,17 @@ module vnetConnectivity 'connectivity/connectivity.bicep' =
       authKeyName: authKeyName
       connectionName: connectionName
       location: location
+    }
+  }
+
+module netAppVolume 'storage/storage.bicep' =
+  if (addNetAppVolume) {
+    name: '${name}-netAppVolume'
+    params: {
+      privateCloudName: privateCloud.name
+      netAppDatastoreName: netAppDatastoreName
+      netAppVolumeId: netAppVolumeId
+      clusterName: privateCloudClusterName
     }
   }
 
