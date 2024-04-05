@@ -7,7 +7,7 @@ metadata description = 'This instance deploys the module with most of its featur
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceShort}-rg'
+param resourceGroupName string = '${namePrefix}-avs.privatecloud-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -16,7 +16,7 @@ param location string = deployment().location
 param serviceShort string = 'sddcwaf'
 
 @description('Optional. A token to inject into the name of each resource.')
-param namePrefix string = 'avm'
+param namePrefix string = '#_namePrefix_#'
 
 @description('Optional. The identity of the private cloud, if configured.')
 param identityType string = 'SystemAssigned'
@@ -58,7 +58,7 @@ module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/t
 
 // Test Execution
 @batchSize(1)
-module testPrivateCloud '../../../main.bicep' = [
+module testDeployment '../../../main.bicep' = [
   for iteration in ['init']: {
     scope: resourceGroup
     name: '${uniqueString(deployment().name, location)}-test-${serviceShort}-${iteration}'

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.26.54.24096",
+      "templateHash": "15067164393041652882"
+    }
+  },
+  "parameters": {
+    "privateCloudName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the AVS private cloud."
+      }
+    },
+    "hcxAddonEnabled": {
+      "type": "bool",
+      "metadata": {
+        "description": "Required. Define if the HCX Addon will be deployed or not."
+      }
+    },
+    "hcxOffer": {
+      "type": "string",
+      "defaultValue": "VMware MaaS Cloud Provider (Enterprise)",
+      "metadata": {
+        "description": "Required. The HCX offer."
+      }
+    },
+    "srmAddonEnabled": {
+      "type": "bool",
+      "metadata": {
+        "description": "Required. Define if the SRM Addon will be deployed or not."
+      }
+    },
+    "srmLicenseKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Optional. License key for SRM, if SRM Addon is enabled."
+      }
+    },
+    "srmReplicationServersCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Optional. Number of vSphere Replication Servers to be created if SRM Addon is enabled."
+      }
+    },
+    "arcAddonEnabled": {
+      "type": "bool",
+      "metadata": {
+        "description": "Required. Define if the ARC Addon will be deployed or not."
+      }
+    },
+    "vcenterResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Conditional. Required if ARC Addon is enabled. The VMware vCenter resource ID."
+      }
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('hcxAddonEnabled')]",
+      "type": "Microsoft.AVS/privateClouds/addons",
+      "apiVersion": "2023-03-01",
+      "name": "[format('{0}/{1}', parameters('privateCloudName'), 'hcx')]",
+      "properties": {
+        "addonType": "HCX",
+        "offer": "[parameters('hcxOffer')]"
+      }
+    },
+    {
+      "condition": "[parameters('srmAddonEnabled')]",
+      "type": "Microsoft.AVS/privateClouds/addons",
+      "apiVersion": "2023-03-01",
+      "name": "[format('{0}/{1}', parameters('privateCloudName'), 'srm')]",
+      "properties": {
+        "addonType": "SRM",
+        "licenseKey": "[if(equals(parameters('srmLicenseKey'), ''), null(), parameters('srmLicenseKey'))]"
+      }
+    },
+    {
+      "condition": "[parameters('srmAddonEnabled')]",
+      "type": "Microsoft.AVS/privateClouds/addons",
+      "apiVersion": "2023-03-01",
+      "name": "[format('{0}/{1}', parameters('privateCloudName'), 'vr')]",
+      "properties": {
+        "addonType": "VR",
+        "vrsCount": "[parameters('srmReplicationServersCount')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'srm')]"
+      ]
+    },
+    {
+      "condition": "[parameters('arcAddonEnabled')]",
+      "type": "Microsoft.AVS/privateClouds/addons",
+      "apiVersion": "2023-03-01",
+      "name": "[format('{0}/{1}', parameters('privateCloudName'), 'Arc')]",
+      "properties": {
+        "addonType": "Arc",
+        "vCenter": "[parameters('vcenterResourceId')]"
+      }
+    }
+  ]
+}

@@ -50,6 +50,7 @@ body:
         - "avm/res/app/container-app"
         - "avm/res/app/managed-environment"
         - "avm/res/automation/automation-account"
+        - "avm/res/avs/private-cloud"
         - "avm/res/batch/batch-account"
         - "avm/res/cache/redis"
         - "avm/res/cdn/profile"

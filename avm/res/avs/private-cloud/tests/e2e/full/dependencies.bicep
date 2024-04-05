@@ -55,13 +55,14 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-
   location: location
 }
 
-module natGatewayPublicIP '../../../../../network/public-ip-address/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-natGatewayPublicIP'
-  params: {
-    name: natGatewayPublicIPName
-    location: location
+resource natGatewayPublicIP 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+  name: natGatewayPublicIPName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
     publicIPAllocationMethod: 'Static'
-    skuName: 'Standard'
   }
 }
 
@@ -74,64 +75,69 @@ resource natGateway 'Microsoft.Network/natGateways@2023-09-01' = {
   properties: {
     publicIpAddresses: [
       {
-        id: natGatewayPublicIP.outputs.resourceId
+        id: natGatewayPublicIP.id
       }
     ]
   }
-  dependsOn: [
-    natGatewayPublicIP
-  ]
 }
 
-module gatewayVNet '../../../../../network/virtual-network/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-gatewayVNet'
-  params: {
-    name: gatewayVNetName
-    location: location
-    addressPrefixes: [
-      '10.100.0.0/16'
-    ]
+resource gatewayVNet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
+  name: gatewayVNetName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.100.0.0/16'
+      ]
+    }
     subnets: [
       {
-        addressPrefix: '10.100.0.0/24'
         name: 'GatewaySubnet'
+        properties: {
+          addressPrefix: '10.100.0.0/24'
+        }
       }
       {
-        addressPrefix: '10.100.1.0/24'
         name: 'VMSubnet'
-        natGateway: natGateway.id
-      }
-      {
-        addressPrefix: '10.100.2.0/24'
-        name: 'AzureBastionSubnet'
-      }
-      {
-        addressPrefix: '10.100.3.0/24'
-        name: 'ANFSubnet'
-        delegations: [
-          {
-            name: 'Microsoft.NetApp/volumes'
-            properties: {
-              serviceName: 'Microsoft.NetApp/volumes'
-              actions: [
-                'Microsoft.Network/networkinterfaces/*'
-                'Microsoft.Network/virtualNetworks/subnets/join/action'
-              ]
-            }
+        properties: {
+          addressPrefix: '10.100.1.0/24'
+          natGateway: {
+            id: natGateway.id
           }
-        ]
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: '10.100.2.0/24'
+        }
+      }
+      {
+        name: 'ANFSubnet'
+        properties: {
+          addressPrefix: '10.100.3.0/24'
+          delegations: [
+            {
+              name: 'Microsoft.NetApp/volumes'
+              properties: {
+                serviceName: 'Microsoft.NetApp/volumes'
+              }
+            }
+          ]
+        }
       }
     ]
   }
 }
 
-module gatewayPublicIP '../../../../../network/public-ip-address/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-gatewayPublicIP'
-  params: {
-    name: gatewayPublicIPName
-    location: location
+resource gatewayPublicIP 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+  name: gatewayPublicIPName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
     publicIPAllocationMethod: 'Static'
-    skuName: 'Standard'
   }
 }
 
@@ -144,10 +150,10 @@ resource gateway 'Microsoft.Network/virtualnetworkgateways@2021-02-01' = {
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: gatewayVNet.outputs.subnetResourceIds[0]
+            id: '${gatewayVNet.id}/subnets/GatewaySubnet'
           }
           publicIPAddress: {
-            id: gatewayPublicIP.outputs.resourceId
+            id: gatewayPublicIP.id
           }
         }
         name: 'gwIPConfig'
@@ -159,70 +165,102 @@ resource gateway 'Microsoft.Network/virtualnetworkgateways@2021-02-01' = {
       tier: 'ErGw1AZ'
     }
   }
-  dependsOn: [
-    gatewayVNet
-    gatewayPublicIP
-  ]
 }
 
-module bastionPublicIP '../../../../../network/public-ip-address/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-bastionPublicIP'
-  params: {
-    name: bastionPublicIPName
-    location: location
+resource bastionPublicIP 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+  name: bastionPublicIPName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
     publicIPAllocationMethod: 'Static'
-    skuName: 'Standard'
   }
 }
 
-module bastionHost '../../../../../network/bastion-host/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-bastionHost'
-  params: {
-    name: bastionName
-    location: location
-    vNetId: gatewayVNet.outputs.resourceId
-    bastionSubnetPublicIpResourceId: bastionPublicIP.outputs.resourceId
-    skuName: 'Basic'
+resource bastionHost 'Microsoft.Network/bastionHosts@2023-09-01' = {
+  name: bastionName
+  location: location
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    ipConfigurations: [
+      {
+        properties: {
+          subnet: {
+            id: '${gatewayVNet.id}/subnets/AzureBastionSubnet'
+          }
+          publicIPAddress: {
+            id: bastionPublicIP.id
+          }
+        }
+        name: 'ipConfigAzureBastionSubnet'
+      }
+    ]
   }
 }
 
-module keyVault '../../../../../key-vault/vault/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-keyVault'
-  params: {
-    name: keyVaultName
-    location: location
-    enableVaultForDeployment: true
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: keyVaultName
+  location: location
+  properties: {
+    enabledForDeployment: true
+    tenantId: subscription().tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Allow'
     }
-    keys: [
-      {
-        name: 'cmk-disk-key'
-        kty: 'RSA'
-        keySize: 2048
-        keyOps: [
-          'decrypt'
-          'encrypt'
-          'sign'
-          'unwrapKey'
-          'wrapKey'
-          'verify'
-        ]
-      }
+    accessPolicies: []
+  }
+}
+
+resource keyVaultKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
+  parent: keyVault
+  name: 'cmk-disk-key'
+  properties: {
+    kty: 'RSA'
+    keySize: 2048
+    keyOps: [
+      'decrypt'
+      'encrypt'
+      'sign'
+      'unwrapKey'
+      'wrapKey'
+      'verify'
     ]
-    roleAssignments: [
-      {
-        roleDefinitionIdOrName: 'Key Vault Administrator'
-        principalId: managedIdentity.properties.principalId
-        principalType: 'ServicePrincipal'
-      }
-      {
-        roleDefinitionIdOrName: 'Key Vault Crypto Officer'
-        principalId: managedIdentity.properties.principalId
-        principalType: 'ServicePrincipal'
-      }
-    ]
+  }
+}
+
+resource keyVaultAdministratorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+}
+
+resource keyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, managedIdentity.id, keyVaultAdministratorRoleDefinition.id)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: keyVaultAdministratorRoleDefinition.id
+    principalId: managedIdentity.properties.principalId
+  }
+}
+
+resource keyVaultCryptoOfficerRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '14b46e9e-c2b7-41b4-b07b-48a6ebf60603'
+}
+
+resource keyVaultCryptoOfficer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, managedIdentity.id, keyVaultCryptoOfficerRoleDefinition.id)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: keyVaultCryptoOfficerRoleDefinition.id
+    principalId: managedIdentity.properties.principalId
   }
 }
 
@@ -246,7 +284,7 @@ resource anfVolume 'Microsoft.NetApp/netAppAccounts/capacityPools/volumes@2023-0
   location: location
   parent: anfPool
   properties: {
-    subnetId: gatewayVNet.outputs.subnetResourceIds[3]
+    subnetId: '${gatewayVNet.id}/subnets/ANFSubnet'
     usageThreshold: 2199023255552
     creationToken: 'avsVolume'
     avsDataStore: 'Enabled'
@@ -277,15 +315,18 @@ resource anfVolume 'Microsoft.NetApp/netAppAccounts/capacityPools/volumes@2023-0
   }
 }
 
-module jumpVMNIC '../../../../../network/network-interface/main.bicep' = {
-  name: '${uniqueString(deployment().name, location)}-jumpVMNIC'
-  params: {
-    name: jumpVMNICName
-    location: location
+resource jumpVMNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
+  name: jumpVMNICName
+  location: location
+  properties: {
     ipConfigurations: [
       {
         name: 'ipconfig1'
-        subnetResourceId: gatewayVNet.outputs.subnetResourceIds[1]
+        properties: {
+          subnet: {
+            id: '${gatewayVNet.id}/subnets/VMSubnet'
+          }
+        }
       }
     ]
     enableAcceleratedNetworking: true
@@ -324,7 +365,7 @@ resource jumpVM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: jumpVMNIC.outputs.resourceId
+          id: jumpVMNIC.id
         }
       ]
     }
@@ -334,14 +375,53 @@ resource jumpVM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
 @description('The principal ID of the created Managed Identity.')
 output managedIdentityPrincipalId string = managedIdentity.properties.principalId
 
+@description('The resource ID of the created NAT Gateway Public IP Address.')
+output natGatewayPublicIPResourceId string = natGatewayPublicIP.id
+
+@description('The name of the created NAT Gateway Public IP Address.')
+output natGatewayPublicIPName string = natGatewayPublicIP.name
+
 @description('The resource ID of the created NAT Gateway.')
 output natGatewayResourceId string = natGateway.id
+
+@description('The name of the created NAT Gateway.')
+output natGatewayName string = natGateway.name
+
+@description('The resource ID of the created Gateway Virtual Network.')
+output gatewayVNetResourceId string = gatewayVNet.id
+
+@description('The name of the created Gateway Virtual Network.')
+output gatewayVNetName string = gatewayVNet.name
+
+@description('The resource ID of the created Gateway Public IP Address.')
+output gatewayPublicIPResourceId string = gatewayPublicIP.id
+
+@description('The name of the created Gateway Public IP Address.')
+output gatewayPublicIPName string = gatewayPublicIP.name
 
 @description('The resource ID of the created Virtual Network Gateway.')
 output gatewayResourceId string = gateway.id
 
 @description('The name of the created Virtual Network Gateway.')
 output gatewayName string = gateway.name
+
+@description('The resource ID of the created Bastion Public IP Address.')
+output bastionPublicIPResourceId string = bastionPublicIP.id
+
+@description('The name of the created Bastion Public IP Address.')
+output bastionPublicIPName string = bastionPublicIP.name
+
+@description('The resource ID of the created Bastion Host.')
+output bastionResourceId string = bastionHost.id
+
+@description('The name of the created Bastion Host.')
+output bastionName string = bastionHost.name
+
+@description('The resource ID of the created Key Vault.')
+output keyVaultResourceId string = keyVault.id
+
+@description('The name of the created Key Vault.')
+output keyVaultName string = keyVault.name
 
 @description('The resource ID of the created ANF Account.')
 output anfAccountResourceId string = anfAccount.id
@@ -357,6 +437,12 @@ output anfPoolName string = anfPool.name
 
 @description('The resource ID of the created ANF Volume.')
 output anfVolumeResourceId string = anfVolume.id
+
+@description('The resource ID of the created Jump VM NIC.')
+output jumpVMNICResourceId string = jumpVMNIC.id
+
+@description('The name of the created Jump VM NIC.')
+output jumpVMNICName string = jumpVMNIC.name
 
 @description('The resource ID of the created Jump VM.')
 output jumpVMResourceId string = jumpVM.id

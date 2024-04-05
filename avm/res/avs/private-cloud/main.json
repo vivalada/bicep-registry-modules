@@ -1,0 +1,950 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.26.54.24096",
+      "templateHash": "8265160175492680249"
+    },
+    "name": "AVS Private Cloud",
+    "description": "This module deploys an AVS Private Cloud.",
+    "owner": "Azure/module-maintainers"
+  },
+  "definitions": {
+    "diagnosticSettingType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The name of diagnostic setting."
+            }
+          },
+          "logCategoriesAndGroups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Name of a Diagnostic Log category for a resource type this setting is applied to. Set the specific logs to collect here."
+                  }
+                },
+                "categoryGroup": {
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {
+                    "description": "Optional. Name of a Diagnostic Log category group for a resource type this setting is applied to. Set to `allLogs` to collect all logs."
+                  }
+                }
+              }
+            },
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The name of logs that will be streamed. \"allLogs\" includes all possible logs for the resource. Set to '' to disable log collection."
+            }
+          },
+          "metricCategories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required. Name of a Diagnostic Metric category for a resource type this setting is applied to. Set to `AllMetrics` to collect all metrics."
+                  }
+                }
+              }
+            },
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The name of logs that will be streamed. \"allLogs\" includes all possible logs for the resource. Set to '' to disable log collection."
+            }
+          },
+          "logAnalyticsDestinationType": {
+            "type": "string",
+            "allowedValues": [
+              "AzureDiagnostics",
+              "Dedicated"
+            ],
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. A string indicating whether the export to Log Analytics should use the default destination type, i.e. AzureDiagnostics, or use a destination type."
+            }
+          },
+          "workspaceResourceId": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. Resource ID of the diagnostic log analytics workspace. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub."
+            }
+          },
+          "storageAccountResourceId": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. Resource ID of the diagnostic storage account. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub."
+            }
+          },
+          "eventHubAuthorizationRuleResourceId": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to."
+            }
+          },
+          "eventHubName": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub."
+            }
+          },
+          "marketplacePartnerResourceId": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs."
+            }
+          }
+        }
+      },
+      "nullable": true
+    },
+    "roleAssignmentType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "roleDefinitionIdOrName": {
+            "type": "string",
+            "metadata": {
+              "description": "Required. The role to assign. You can provide either the display name of the role definition, the role definition GUID, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'."
+            }
+          },
+          "principalId": {
+            "type": "string",
+            "metadata": {
+              "description": "Required. The principal ID of the principal (user/group/identity) to assign the role to."
+            }
+          },
+          "principalType": {
+            "type": "string",
+            "allowedValues": [
+              "Device",
+              "ForeignGroup",
+              "Group",
+              "ServicePrincipal",
+              "User"
+            ],
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The principal type of the assigned principal ID."
+            }
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The description of the role assignment."
+            }
+          },
+          "condition": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase \"foo_storage_container\"."
+            }
+          },
+          "conditionVersion": {
+            "type": "string",
+            "allowedValues": [
+              "2.0"
+            ],
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. Version of the condition."
+            }
+          },
+          "delegatedManagedIdentityResourceId": {
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "description": "Optional. The Resource Id of the delegated managed identity resource."
+            }
+          }
+        }
+      },
+      "nullable": true
+    },
+    "lockType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Specify the name of lock."
+          }
+        },
+        "kind": {
+          "type": "string",
+          "allowedValues": [
+            "CanNotDelete",
+            "None",
+            "ReadOnly"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Specify the type of lock."
+          }
+        }
+      },
+      "nullable": true
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The AVS Private Cloud name."
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "allowedValues": [
+        "AV36",
+        "AV36T",
+        "AV36P",
+        "AV36PT",
+        "AV52"
+      ],
+      "metadata": {
+        "description": "Required. The AVS Private Cloud SKU name."
+      }
+    },
+    "clusterSize": {
+      "type": "int",
+      "minValue": 3,
+      "maxValue": 16,
+      "metadata": {
+        "description": "Required. The management cluster size."
+      }
+    },
+    "networkBlock": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The network block for the AVS Private Cloud."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Optional. Location for all resources."
+      }
+    },
+    "identityType": {
+      "type": "string",
+      "defaultValue": "None",
+      "allowedValues": [
+        "None",
+        "SystemAssigned"
+      ],
+      "metadata": {
+        "description": "Optional. The identity of the private cloud, if configured."
+      }
+    },
+    "internetEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. The internet access configuration."
+      }
+    },
+    "stretchClusterEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required. Set this value to true if deploying an AVS stretch cluster."
+      }
+    },
+    "primaryZone": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Optional. This value represents the zone for deployment in a standard deployment or the primary zone in a stretch cluster deployment. Defaults to null to let Azure select the zone."
+      }
+    },
+    "secondaryZone": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Conditional. Required if it is a stretched cluster deployment. This value represents the secondary zone in a stretched cluster deployment."
+      }
+    },
+    "nsxtPassword": {
+      "type": "securestring",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The password value to use for the cloudadmin account password in the local domain in NSX-T. If this is left as null a random password will be generated for the deployment."
+      }
+    },
+    "vcenterPassword": {
+      "type": "securestring",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The password value to use for the cloudadmin account password in the local domain in vCenter. If this is left as null a random password will be generated for the deployment."
+      }
+    },
+    "hcxAddonEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required. Define if the HCX Addon will be deployed or not."
+      }
+    },
+    "hcxOffer": {
+      "type": "string",
+      "defaultValue": "VMware MaaS Cloud Provider (Enterprise)",
+      "allowedValues": [
+        "VMware MaaS Cloud Provider (Enterprise)",
+        "VMware MaaS Cloud Provider"
+      ],
+      "metadata": {
+        "description": "Required. The HCX offer."
+      }
+    },
+    "srmAddonEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required. Define if the SRM Addon will be deployed or not."
+      }
+    },
+    "srmLicenseKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if SRM Addon is enabled. License key for SRM."
+      }
+    },
+    "srmReplicationServersCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Conditional. Required if SRM Addon is enabled. Number of vSphere Replication Servers to be created."
+      }
+    },
+    "arcAddonEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required. Define if the ARC Addon will be deployed or not."
+      }
+    },
+    "vcenterResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if ARC Addon is enabled. The VMware vCenter resource ID."
+      }
+    },
+    "enablevNetConnectivity": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Create vNet Connection."
+      }
+    },
+    "gatewayName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if vNet Connectivity is enabled. The name of the ExpressRoute Virtual Network Gateway of the customer Hub Network."
+      }
+    },
+    "authKeyName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if vNet Connectivity is enabled. The name of the Authorization Key."
+      }
+    },
+    "connectionName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if vNet Connectivity is enabled. The name of the Connection."
+      }
+    },
+    "addNetAppVolume": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Add NetApp Volume."
+      }
+    },
+    "netAppDatastoreName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if Add NetApp Volume is enabled. The name of the NetApp Datastore."
+      }
+    },
+    "netAppVolumeId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if Add NetApp Volume is enabled. The NetApp Volume ID."
+      }
+    },
+    "privateCloudClusterName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Conditional. Required if Add NetApp Volume is enabled. The name of the private cloud cluster."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Resource tags."
+      }
+    },
+    "enableTelemetry": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Enable/Disable usage telemetry for module."
+      }
+    },
+    "lock": {
+      "$ref": "#/definitions/lockType",
+      "metadata": {
+        "description": "Optional. The lock settings of the service."
+      }
+    },
+    "diagnosticSettings": {
+      "$ref": "#/definitions/diagnosticSettingType",
+      "metadata": {
+        "description": "Optional. The diagnostic settings of the service."
+      }
+    },
+    "roleAssignments": {
+      "$ref": "#/definitions/roleAssignmentType",
+      "metadata": {
+        "description": "Optional. Array of role assignments to create."
+      }
+    }
+  },
+  "variables": {
+    "privateCloudStandardProperties": {
+      "networkBlock": "[parameters('networkBlock')]",
+      "internet": "[if(parameters('internetEnabled'), 'Enabled', 'Disabled')]",
+      "managementCluster": {
+        "clusterSize": "[parameters('clusterSize')]"
+      },
+      "availability": {
+        "secondaryZone": "[if(equals(parameters('secondaryZone'), 0), null(), parameters('secondaryZone'))]",
+        "zone": "[if(equals(parameters('primaryZone'), 0), null(), parameters('primaryZone'))]",
+        "strategy": "[if(parameters('stretchClusterEnabled'), 'DualZone', 'SingleZone')]"
+      }
+    },
+    "privateCloudProperties": "[union(variables('privateCloudStandardProperties'), if(not(empty(parameters('nsxtPassword'))), createObject('nsxtPassword', parameters('nsxtPassword')), createObject()), if(not(empty(parameters('vcenterPassword'))), createObject('vcenterPassword', parameters('vcenterPassword')), createObject()))]",
+    "anyAddOnEnabled": "[if(or(or(parameters('hcxAddonEnabled'), parameters('srmAddonEnabled')), parameters('arcAddonEnabled')), true(), false())]",
+    "builtInRoleNames": {
+      "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+      "Owner": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+      "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+      "Role Based Access Control Administrator (Preview)": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f58310d9-a9f6-439a-9e8d-f62e7b41a168')]",
+      "User Access Administrator": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]"
+    }
+  },
+  "resources": {
+    "avmTelemetry": {
+      "condition": "[parameters('enableTelemetry')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2023-07-01",
+      "name": "[format('46d3xbcp.res.avs-privatecloud.{0}.{1}', replace('-..--..-', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [],
+          "outputs": {
+            "telemetry": {
+              "type": "String",
+              "value": "For more information, see https://aka.ms/avm/TelemetryInfo"
+            }
+          }
+        }
+      }
+    },
+    "privateCloud": {
+      "type": "Microsoft.AVS/privateClouds",
+      "apiVersion": "2023-03-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[toLower(parameters('skuName'))]"
+      },
+      "identity": {
+        "type": "[parameters('identityType')]"
+      },
+      "properties": "[variables('privateCloudProperties')]"
+    },
+    "privateCloud_lock": {
+      "condition": "[and(not(empty(coalesce(parameters('lock'), createObject()))), not(equals(tryGet(parameters('lock'), 'kind'), 'None')))]",
+      "type": "Microsoft.Authorization/locks",
+      "apiVersion": "2020-05-01",
+      "scope": "[format('Microsoft.AVS/privateClouds/{0}', parameters('name'))]",
+      "name": "[coalesce(tryGet(parameters('lock'), 'name'), format('lock-{0}', parameters('name')))]",
+      "properties": {
+        "level": "[coalesce(tryGet(parameters('lock'), 'kind'), '')]",
+        "notes": "[if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.')]"
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    },
+    "privateCloud_diagnosticSettings": {
+      "copy": {
+        "name": "privateCloud_diagnosticSettings",
+        "count": "[length(coalesce(parameters('diagnosticSettings'), createArray()))]"
+      },
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[format('Microsoft.AVS/privateClouds/{0}', parameters('name'))]",
+      "name": "[coalesce(tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'name'), format('{0}-diagnosticSettings', parameters('name')))]",
+      "properties": {
+        "storageAccountId": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'storageAccountResourceId')]",
+        "workspaceId": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'workspaceResourceId')]",
+        "eventHubAuthorizationRuleId": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'eventHubAuthorizationRuleResourceId')]",
+        "eventHubName": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'eventHubName')]",
+        "metrics": "[coalesce(tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'metricCategories'), createArray(createObject('category', 'AllMetrics', 'timeGrain', null(), 'enabled', true())))]",
+        "logs": "[coalesce(tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'logCategoriesAndGroups'), createArray(createObject('categoryGroup', 'AllLogs', 'enabled', true())))]",
+        "marketplacePartnerId": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'marketplacePartnerResourceId')]",
+        "logAnalyticsDestinationType": "[tryGet(coalesce(parameters('diagnosticSettings'), createArray())[copyIndex()], 'logAnalyticsDestinationType')]"
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    },
+    "privateCloud_RoleAssignments": {
+      "copy": {
+        "name": "privateCloud_RoleAssignments",
+        "count": "[length(coalesce(parameters('roleAssignments'), createArray()))]"
+      },
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.AVS/privateClouds/{0}', parameters('name'))]",
+      "name": "[guid(resourceId('Microsoft.AVS/privateClouds', parameters('name')), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].principalId, coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName)]",
+      "properties": {
+        "roleDefinitionId": "[if(contains(variables('builtInRoleNames'), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName), variables('builtInRoleNames')[coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName], if(contains(coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName, '/providers/Microsoft.Authorization/roleDefinitions/'), coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName, subscriptionResourceId('Microsoft.Authorization/roleDefinitions', coalesce(parameters('roleAssignments'), createArray())[copyIndex()].roleDefinitionIdOrName)))]",
+        "principalId": "[coalesce(parameters('roleAssignments'), createArray())[copyIndex()].principalId]",
+        "description": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'description')]",
+        "principalType": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'principalType')]",
+        "condition": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'condition')]",
+        "conditionVersion": "[if(not(empty(tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'condition'))), coalesce(tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'conditionVersion'), '2.0'), null())]",
+        "delegatedManagedIdentityResourceId": "[tryGet(coalesce(parameters('roleAssignments'), createArray())[copyIndex()], 'delegatedManagedIdentityResourceId')]"
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    },
+    "addOns": {
+      "condition": "[variables('anyAddOnEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}-addons', parameters('name'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "privateCloudName": {
+            "value": "[parameters('name')]"
+          },
+          "hcxAddonEnabled": {
+            "value": "[parameters('hcxAddonEnabled')]"
+          },
+          "hcxOffer": {
+            "value": "[parameters('hcxOffer')]"
+          },
+          "srmAddonEnabled": {
+            "value": "[parameters('srmAddonEnabled')]"
+          },
+          "srmLicenseKey": {
+            "value": "[parameters('srmLicenseKey')]"
+          },
+          "srmReplicationServersCount": {
+            "value": "[parameters('srmReplicationServersCount')]"
+          },
+          "arcAddonEnabled": {
+            "value": "[parameters('arcAddonEnabled')]"
+          },
+          "vcenterResourceId": {
+            "value": "[parameters('vcenterResourceId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "15067164393041652882"
+            }
+          },
+          "parameters": {
+            "privateCloudName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the AVS private cloud."
+              }
+            },
+            "hcxAddonEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Required. Define if the HCX Addon will be deployed or not."
+              }
+            },
+            "hcxOffer": {
+              "type": "string",
+              "defaultValue": "VMware MaaS Cloud Provider (Enterprise)",
+              "metadata": {
+                "description": "Required. The HCX offer."
+              }
+            },
+            "srmAddonEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Required. Define if the SRM Addon will be deployed or not."
+              }
+            },
+            "srmLicenseKey": {
+              "type": "string",
+              "metadata": {
+                "description": "Optional. License key for SRM, if SRM Addon is enabled."
+              }
+            },
+            "srmReplicationServersCount": {
+              "type": "int",
+              "metadata": {
+                "description": "Optional. Number of vSphere Replication Servers to be created if SRM Addon is enabled."
+              }
+            },
+            "arcAddonEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Required. Define if the ARC Addon will be deployed or not."
+              }
+            },
+            "vcenterResourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Conditional. Required if ARC Addon is enabled. The VMware vCenter resource ID."
+              }
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('hcxAddonEnabled')]",
+              "type": "Microsoft.AVS/privateClouds/addons",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('privateCloudName'), 'hcx')]",
+              "properties": {
+                "addonType": "HCX",
+                "offer": "[parameters('hcxOffer')]"
+              }
+            },
+            {
+              "condition": "[parameters('srmAddonEnabled')]",
+              "type": "Microsoft.AVS/privateClouds/addons",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('privateCloudName'), 'srm')]",
+              "properties": {
+                "addonType": "SRM",
+                "licenseKey": "[if(equals(parameters('srmLicenseKey'), ''), null(), parameters('srmLicenseKey'))]"
+              }
+            },
+            {
+              "condition": "[parameters('srmAddonEnabled')]",
+              "type": "Microsoft.AVS/privateClouds/addons",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('privateCloudName'), 'vr')]",
+              "properties": {
+                "addonType": "VR",
+                "vrsCount": "[parameters('srmReplicationServersCount')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'srm')]"
+              ]
+            },
+            {
+              "condition": "[parameters('arcAddonEnabled')]",
+              "type": "Microsoft.AVS/privateClouds/addons",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('privateCloudName'), 'Arc')]",
+              "properties": {
+                "addonType": "Arc",
+                "vCenter": "[parameters('vcenterResourceId')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    },
+    "vnetConnectivity": {
+      "condition": "[parameters('enablevNetConnectivity')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}-vnetConnection', parameters('name'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "privateCloudName": {
+            "value": "[parameters('name')]"
+          },
+          "gatewayName": {
+            "value": "[parameters('gatewayName')]"
+          },
+          "authKeyName": {
+            "value": "[parameters('authKeyName')]"
+          },
+          "connectionName": {
+            "value": "[parameters('connectionName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "2720263234276520776"
+            },
+            "name": "vNet Connectivity",
+            "description": "Creates a connection between AVS SDDC and a vNet"
+          },
+          "parameters": {
+            "privateCloudName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the AVS private cloud."
+              }
+            },
+            "gatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the customer ExpressRoute Virtual Network Gateway of the Hub vNet."
+              }
+            },
+            "authKeyName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the Authorization Key."
+              }
+            },
+            "connectionName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the connection."
+              }
+            },
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. Location of the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.AVS/privateClouds/authorizations",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('privateCloudName'), parameters('authKeyName'))]"
+            },
+            {
+              "type": "Microsoft.Network/connections",
+              "apiVersion": "2023-09-01",
+              "name": "[parameters('connectionName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "connectionType": "ExpressRoute",
+                "routingWeight": 0,
+                "virtualNetworkGateway1": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('gatewayName'))]",
+                  "properties": {}
+                },
+                "peer": {
+                  "id": "[reference(resourceId('Microsoft.AVS/privateClouds', parameters('privateCloudName')), '2023-03-01').circuit.expressRouteID]"
+                },
+                "authorizationKey": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "expressRouteAuthKey": {
+              "type": "string",
+              "metadata": {
+                "description": "The Authorization Key."
+              },
+              "value": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+            },
+            "connectionId": {
+              "type": "string",
+              "metadata": {
+                "description": "The Connection ID."
+              },
+              "value": "[resourceId('Microsoft.Network/connections', parameters('connectionName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    },
+    "netAppVolume": {
+      "condition": "[parameters('addNetAppVolume')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}-netAppVolume', parameters('name'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "privateCloudName": {
+            "value": "[parameters('name')]"
+          },
+          "netAppDatastoreName": {
+            "value": "[parameters('netAppDatastoreName')]"
+          },
+          "netAppVolumeId": {
+            "value": "[parameters('netAppVolumeId')]"
+          },
+          "clusterName": {
+            "value": "[parameters('privateCloudClusterName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "5414664939507344852"
+            },
+            "name": "Storage Attachment",
+            "description": "Attaches a NetApp storage to the AVS cluster"
+          },
+          "parameters": {
+            "privateCloudName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the AVS private cloud."
+              }
+            },
+            "clusterName": {
+              "type": "string",
+              "defaultValue": "Cluster-1",
+              "metadata": {
+                "description": "Required. The name of the AVS cluster."
+              }
+            },
+            "netAppDatastoreName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the NetApp datastore."
+              }
+            },
+            "netAppVolumeId": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The ID of the NetApp volume."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.AVS/privateClouds/clusters/datastores",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}/{2}', parameters('privateCloudName'), parameters('clusterName'), parameters('netAppDatastoreName'))]",
+              "properties": {
+                "netAppVolume": {
+                  "id": "[parameters('netAppVolumeId')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "privateCloud"
+      ]
+    }
+  },
+  "outputs": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the deployed resource."
+      },
+      "value": "[parameters('name')]"
+    },
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the deployed resource."
+      },
+      "value": "[resourceId('Microsoft.AVS/privateClouds', parameters('name'))]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group of the deployed resource."
+      },
+      "value": "[resourceGroup().name]"
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The location the resource was deployed into."
+      },
+      "value": "[reference('privateCloud', '2023-03-01', 'full').location]"
+    }
+  }
+}

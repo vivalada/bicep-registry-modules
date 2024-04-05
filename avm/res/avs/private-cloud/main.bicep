@@ -116,7 +116,7 @@ param lock lockType
 @description('Optional. The diagnostic settings of the service.')
 param diagnosticSettings diagnosticSettingType
 
-@description('Optional. Array of role assignment objects that contain the \'roleDefinitionIdOrName\' and \'principalId\' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
+@description('Optional. Array of role assignments to create.')
 param roleAssignments roleAssignmentType
 
 // Variables
@@ -197,7 +197,7 @@ resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' = {
   properties: privateCloudProperties
 }
 
-module addOns 'addons/AVSAddons.bicep' =
+module addOns 'addons/main.bicep' =
   if (anyAddOnEnabled) {
     name: '${name}-addons'
     params: {
@@ -212,7 +212,7 @@ module addOns 'addons/AVSAddons.bicep' =
     }
   }
 
-module vnetConnectivity 'connectivity/connectivity.bicep' =
+module vnetConnectivity 'authorizations/main.bicep' =
   if (enablevNetConnectivity) {
     name: '${name}-vnetConnection'
     params: {
@@ -224,7 +224,7 @@ module vnetConnectivity 'connectivity/connectivity.bicep' =
     }
   }
 
-module netAppVolume 'storage/storage.bicep' =
+module netAppVolume 'clusters/datastores/main.bicep' =
   if (addNetAppVolume) {
     name: '${name}-netAppVolume'
     params: {
@@ -297,10 +297,10 @@ resource privateCloud_RoleAssignments 'Microsoft.Authorization/roleAssignments@2
 
 // Outputs
 @description('The name of the deployed resource.')
-output privateCloudName string = privateCloud.name
+output name string = privateCloud.name
 
 @description('The resource ID of the deployed resource.')
-output privateCloudResourceId string = privateCloud.id
+output resourceId string = privateCloud.id
 
 @description('The resource group of the deployed resource.')
 output resourceGroupName string = resourceGroup().name
@@ -349,7 +349,7 @@ type diagnosticSettingType = {
 }[]?
 
 type roleAssignmentType = {
-  @description('Required. The name of the role to assign. If it cannot be found you can specify the role definition ID instead.')
+  @description('Required. The role to assign. You can provide either the display name of the role definition, the role definition GUID, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
   roleDefinitionIdOrName: string
 
   @description('Required. The principal ID of the principal (user/group/identity) to assign the role to.')
@@ -361,7 +361,7 @@ type roleAssignmentType = {
   @description('Optional. The description of the role assignment.')
   description: string?
 
-  @description('Optional. The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container"')
+  @description('Optional. The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container".')
   condition: string?
 
   @description('Optional. Version of the condition.')

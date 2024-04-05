@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.26.54.24096",
+      "templateHash": "2720263234276520776"
+    },
+    "name": "vNet Connectivity",
+    "description": "Creates a connection between AVS SDDC and a vNet"
+  },
+  "parameters": {
+    "privateCloudName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the AVS private cloud."
+      }
+    },
+    "gatewayName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the customer ExpressRoute Virtual Network Gateway of the Hub vNet."
+      }
+    },
+    "authKeyName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the Authorization Key."
+      }
+    },
+    "connectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the connection."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Location of the resources."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.AVS/privateClouds/authorizations",
+      "apiVersion": "2023-03-01",
+      "name": "[format('{0}/{1}', parameters('privateCloudName'), parameters('authKeyName'))]"
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "apiVersion": "2023-09-01",
+      "name": "[parameters('connectionName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "connectionType": "ExpressRoute",
+        "routingWeight": 0,
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('gatewayName'))]",
+          "properties": {}
+        },
+        "peer": {
+          "id": "[reference(resourceId('Microsoft.AVS/privateClouds', parameters('privateCloudName')), '2023-03-01').circuit.expressRouteID]"
+        },
+        "authorizationKey": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "expressRouteAuthKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The Authorization Key."
+      },
+      "value": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+    },
+    "connectionId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Connection ID."
+      },
+      "value": "[resourceId('Microsoft.Network/connections', parameters('connectionName'))]"
+    }
+  }
+}

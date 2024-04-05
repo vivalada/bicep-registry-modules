@@ -41,7 +41,7 @@ resource SRM 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
     parent: privateCloud
     properties: {
       addonType: 'SRM'
-      licenseKey: srmLicenseKey
+      licenseKey: (srmLicenseKey == '') ? null : srmLicenseKey
     }
   }
 
