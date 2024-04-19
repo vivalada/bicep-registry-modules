@@ -35,7 +35,7 @@ The following section provides usage examples for the module, which were used to
 - [Using only defaults](#example-1-using-only-defaults)
 - [Deployment of a private cloud and its dependencies for a full environment](#example-2-deployment-of-a-private-cloud-and-its-dependencies-for-a-full-environment)
 - [Using large parameter set](#example-3-using-large-parameter-set)
-- [Using large parameter set](#example-4-using-large-parameter-set)
+- [WAF Aligned deployment](#example-4-waf-aligned-deployment)
 
 ### Example 1: _Using only defaults_
 
@@ -441,9 +441,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
 </details>
 <p>
 
-### Example 4: _Using large parameter set_
+### Example 4: _WAF Aligned deployment_
 
-This instance deploys the module with most of its features enabled.
+This instance deploys the module aligned with WAF recommendations.
 
 
 <details>
