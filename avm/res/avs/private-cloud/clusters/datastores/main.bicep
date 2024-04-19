@@ -38,7 +38,7 @@ resource netAppDatastore 'Microsoft.AVS/privateClouds/clusters/datastores@2023-0
 output name string = netAppDatastore.name
 
 @description('The Resource ID of the NetApp datastore.')
-output id string = netAppDatastore.id
+output resourceId string = netAppDatastore.id
 
 @description('The resource group of the deployed resource.')
 output resourceGroupName string = resourceGroup().name

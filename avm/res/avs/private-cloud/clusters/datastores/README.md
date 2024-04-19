@@ -61,9 +61,9 @@ The name of the AVS private cloud.
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
-| `id` | string | The Resource ID of the NetApp datastore. |
 | `name` | string | The name of the NetApp datastore. |
 | `resourceGroupName` | string | The resource group of the deployed resource. |
+| `resourceId` | string | The Resource ID of the NetApp datastore. |
 
 ## Cross-referenced modules
 

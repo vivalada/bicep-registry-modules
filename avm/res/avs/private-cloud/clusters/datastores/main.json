@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "12978784045153299152"
+      "templateHash": "17961582331803105067"
     },
     "name": "AVS Private Cloud Clusters Datastores",
     "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
@@ -58,7 +58,7 @@
       },
       "value": "[parameters('netAppDatastoreName')]"
     },
-    "id": {
+    "resourceId": {
       "type": "string",
       "metadata": {
         "description": "The Resource ID of the NetApp datastore."

@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "898503869929144545"
+      "templateHash": "14479822630783514306"
     },
     "name": "AVS Private Cloud",
     "description": "This module deploys an AVS Private Cloud.",
@@ -963,7 +963,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "12978784045153299152"
+              "templateHash": "17961582331803105067"
             },
             "name": "AVS Private Cloud Clusters Datastores",
             "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
@@ -1016,7 +1016,7 @@
               },
               "value": "[parameters('netAppDatastoreName')]"
             },
-            "id": {
+            "resourceId": {
               "type": "string",
               "metadata": {
                 "description": "The Resource ID of the NetApp datastore."
