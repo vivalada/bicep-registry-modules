@@ -126,6 +126,14 @@ param authorizedIPRanges array?
 @description('Optional. Whether to disable run command for the cluster or not.')
 param disableRunCommand bool = false
 
+@description('Optional. Allow or deny public network access for AKS.')
+@allowed([
+  'Enabled'
+  'Disabled'
+  'SecuredByPerimeter'
+])
+param publicNetworkAccess string = 'Disabled'
+
 @description('Optional. Specifies whether to create the cluster as a private cluster or not.')
 param enablePrivateCluster bool = false
 
@@ -140,6 +148,9 @@ param primaryAgentPoolProfile array
 
 @description('Optional. Define one or more secondary/additional agent pools.')
 param agentPools agentPoolType
+
+@description('Optional. Specifies whether the cost analysis add-on is enabled or not. If Enabled `enableStorageProfileDiskCSIDriver` is set to true as it is needed.')
+param costAnalysisEnabled bool = false
 
 @description('Optional. Specifies whether the httpApplicationRouting add-on is enabled or not.')
 param httpApplicationRoutingEnabled bool = false
@@ -263,7 +274,7 @@ param autoScalerProfileSkipNodesWithSystemPods string = 'true'
   'stable'
 ])
 @description('Optional. Auto-upgrade channel on the AKS cluster.')
-param autoUpgradeProfileUpgradeChannel string?
+param autoUpgradeProfileUpgradeChannel string = 'stable'
 
 @description('Optional. Running in Kubenet is disabled by default due to the security related nature of AAD Pod Identity and the risks of IP spoofing.')
 param podIdentityProfileAllowNetworkPluginKubenet bool = false
@@ -340,6 +351,9 @@ param httpProxyConfig object?
 
 @description('Optional. Identities associated with the cluster.')
 param identityProfile object?
+
+@description('Optional. Enables Kubernetes Event-driven Autoscaling (KEDA).')
+param kedaAddon bool = false
 
 @description('Optional. The customer managed key definition.')
 param customerManagedKey customerManagedKeyType
@@ -527,6 +541,11 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
         }
       : null
     servicePrincipalProfile: aksServicePrincipalProfile
+    metricsProfile: {
+      costAnalysis: {
+        enabled: skuTier == 'free' ? false : costAnalysisEnabled
+      }
+    }
     ingressProfile: {
       webAppRouting: {
         enabled: webApplicationRoutingEnabled
@@ -596,6 +615,11 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
     disableLocalAccounts: disableLocalAccounts
     nodeResourceGroup: nodeResourceGroup
     enablePodSecurityPolicy: enablePodSecurityPolicy
+    workloadAutoScalerProfile: {
+      keda: {
+        enabled: kedaAddon
+      }
+    }
     networkProfile: {
       networkDataplane: networkDataplane
       networkPlugin: networkPlugin
@@ -615,6 +639,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
           }
         : null
     }
+    publicNetworkAccess: publicNetworkAccess
     aadProfile: {
       clientAppID: aadProfileClientAppID
       serverAppID: aadProfileServerAppID
@@ -707,7 +732,7 @@ resource managedCluster 'Microsoft.ContainerService/managedClusters@2023-07-02-p
         enabled: enableStorageProfileBlobCSIDriver
       }
       diskCSIDriver: {
-        enabled: enableStorageProfileDiskCSIDriver
+        enabled: costAnalysisEnabled == true && skuTier != 'free' ? true : enableStorageProfileDiskCSIDriver
       }
       fileCSIDriver: {
         enabled: enableStorageProfileFileCSIDriver
@@ -883,8 +908,14 @@ output controlPlaneFQDN string = enablePrivateCluster
 @description('The principal ID of the system assigned identity.')
 output systemAssignedMIPrincipalId string = managedCluster.?identity.?principalId ?? ''
 
+@description('The Client ID of the AKS identity.')
+output kubeletIdentityClientId string = managedCluster.properties.?identityProfile.?kubeletidentity.?clientId ?? ''
+
 @description('The Object ID of the AKS identity.')
-output kubeletidentityObjectId string = managedCluster.properties.?identityProfile.?kubeletidentity.?objectId ?? ''
+output kubeletIdentityObjectId string = managedCluster.properties.?identityProfile.?kubeletidentity.?objectId ?? ''
+
+@description('The Resource ID of the AKS identity.')
+output kubeletIdentityResourceId string = managedCluster.properties.?identityProfile.?kubeletidentity.?resourceId ?? ''
 
 @description('The Object ID of the OMS agent identity.')
 output omsagentIdentityObjectId string = managedCluster.properties.?addonProfiles.?omsagent.?identity.?objectId ?? ''
