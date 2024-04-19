@@ -1,6 +1,6 @@
-# vNet Connectivity `[Microsoft.AVS/privateClouds/authorizations]`
+# AVS Private Cloud Authorizations `[Microsoft.AVS/privateClouds/authorizations]`
 
-Creates a connection between AVS SDDC and a vNet
+This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.
 
 ## Navigation
 

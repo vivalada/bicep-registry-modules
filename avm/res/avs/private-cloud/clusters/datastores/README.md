@@ -1,6 +1,6 @@
-# Storage Attachment `[Microsoft.AVS/privateClouds/clusters/datastores]`
+# AVS Private Cloud Clusters Datastores `[Microsoft.AVS/privateClouds/clusters/datastores]`
 
-Attaches a NetApp storage to the AVS cluster
+This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.
 
 ## Navigation
 

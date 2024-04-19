@@ -1,5 +1,6 @@
-#  `[Microsoft.AVS/privateClouds/addons]`
+# AVS Private Cloud Addons `[Microsoft.AVS/privateClouds/addons]`
 
+This module deploys a AVS Addons, when any Addon is enabled.
 
 ## Navigation
 

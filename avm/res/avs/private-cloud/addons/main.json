@@ -5,8 +5,11 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "15067164393041652882"
-    }
+      "templateHash": "2682269963635990238"
+    },
+    "name": "AVS Private Cloud Addons",
+    "description": "This module deploys a AVS Addons, when any Addon is enabled.",
+    "owner": "Azure/module-maintainers"
   },
   "parameters": {
     "privateCloudName": {

@@ -5,10 +5,11 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "2720263234276520776"
+      "templateHash": "12351509657260534156"
     },
-    "name": "vNet Connectivity",
-    "description": "Creates a connection between AVS SDDC and a vNet"
+    "name": "AVS Private Cloud Authorizations",
+    "description": "This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.",
+    "owner": "Azure/module-maintainers"
   },
   "parameters": {
     "privateCloudName": {

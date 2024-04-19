@@ -1,5 +1,6 @@
-metadata name = 'vNet Connectivity'
-metadata description = 'Creates a connection between AVS SDDC and a vNet'
+metadata name = 'AVS Private Cloud Authorizations'
+metadata description = 'This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.'
+metadata owner = 'Azure/module-maintainers'
 
 @description('Required. The name of the AVS private cloud.')
 param privateCloudName string

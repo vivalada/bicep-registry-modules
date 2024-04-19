@@ -5,10 +5,11 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "5414664939507344852"
+      "templateHash": "3441390730703148648"
     },
-    "name": "Storage Attachment",
-    "description": "Attaches a NetApp storage to the AVS cluster"
+    "name": "AVS Private Cloud Clusters Datastores",
+    "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
+    "owner": "Azure/module-maintainers"
   },
   "parameters": {
     "privateCloudName": {

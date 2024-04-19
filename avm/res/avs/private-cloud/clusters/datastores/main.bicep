@@ -1,5 +1,6 @@
-metadata name = 'Storage Attachment'
-metadata description = 'Attaches a NetApp storage to the AVS cluster'
+metadata name = 'AVS Private Cloud Clusters Datastores'
+metadata description = 'This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.'
+metadata owner = 'Azure/module-maintainers'
 
 @description('Required. The name of the AVS private cloud.')
 param privateCloudName string

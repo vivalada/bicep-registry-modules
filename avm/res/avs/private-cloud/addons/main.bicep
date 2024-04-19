@@ -1,3 +1,7 @@
+metadata name = 'AVS Private Cloud Addons'
+metadata description = 'This module deploys a AVS Addons, when any Addon is enabled.'
+metadata owner = 'Azure/module-maintainers'
+
 @description('Required. The name of the AVS private cloud.')
 param privateCloudName string
 
@@ -67,3 +71,5 @@ resource Arc 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
       vCenter: vcenterResourceId
     }
   }
+
+// Outputs

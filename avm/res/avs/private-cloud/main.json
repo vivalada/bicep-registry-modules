@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "8265160175492680249"
+      "templateHash": "1166164905749371343"
     },
     "name": "AVS Private Cloud",
     "description": "This module deploys an AVS Private Cloud.",
@@ -609,8 +609,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "15067164393041652882"
-            }
+              "templateHash": "2682269963635990238"
+            },
+            "name": "AVS Private Cloud Addons",
+            "description": "This module deploys a AVS Addons, when any Addon is enabled.",
+            "owner": "Azure/module-maintainers"
           },
           "parameters": {
             "privateCloudName": {
@@ -748,10 +751,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "2720263234276520776"
+              "templateHash": "12351509657260534156"
             },
-            "name": "vNet Connectivity",
-            "description": "Creates a connection between AVS SDDC and a vNet"
+            "name": "AVS Private Cloud Authorizations",
+            "description": "This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.",
+            "owner": "Azure/module-maintainers"
           },
           "parameters": {
             "privateCloudName": {
@@ -866,10 +870,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "5414664939507344852"
+              "templateHash": "3441390730703148648"
             },
-            "name": "Storage Attachment",
-            "description": "Attaches a NetApp storage to the AVS cluster"
+            "name": "AVS Private Cloud Clusters Datastores",
+            "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
+            "owner": "Azure/module-maintainers"
           },
           "parameters": {
             "privateCloudName": {
@@ -931,13 +936,6 @@
         "description": "The resource ID of the deployed resource."
       },
       "value": "[resourceId('Microsoft.AVS/privateClouds', parameters('name'))]"
-    },
-    "resourceGroupName": {
-      "type": "string",
-      "metadata": {
-        "description": "The resource group of the deployed resource."
-      },
-      "value": "[resourceGroup().name]"
     },
     "location": {
       "type": "string",
