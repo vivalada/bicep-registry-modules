@@ -23,11 +23,11 @@ param identityType string = 'SystemAssigned'
 
 @description('Optional. Set the NSX-T Manager password when the private cloud is created.')
 @secure()
-param nsxtPassword string
+param nsxtPassword string = newGuid()
 
 @description('Optional. Set the vCenter Admin password when the private cloud is created.')
 @secure()
-param vcenterPassword string
+param vcenterPassword string = newGuid()
 
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {

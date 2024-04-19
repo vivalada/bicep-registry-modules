@@ -26,7 +26,7 @@ param identityType string = 'SystemAssigned'
 
 @description('Optional. The password value to use for the Jump VM Administrator account.')
 @secure()
-param jumpVMAdminPassword string
+param jumpVMAdminPassword string = newGuid()
 
 // Dependencies
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
