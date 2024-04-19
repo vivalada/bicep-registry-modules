@@ -15,7 +15,7 @@ param authKeyName string
 param connectionName string
 
 @description('Required. Location of the resources.')
-param location string
+param location string = resourceGroup().location
 
 resource privateCloud 'Microsoft.AVS/privateClouds@2023-03-01' existing = {
   name: privateCloudName

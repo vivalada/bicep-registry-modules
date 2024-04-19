@@ -54,8 +54,9 @@ The name of the customer ExpressRoute Virtual Network Gateway of the Hub vNet.
 
 Location of the resources.
 
-- Required: Yes
+- Required: No
 - Type: string
+- Default: `[resourceGroup().location]`
 
 ### Parameter: `privateCloudName`
 

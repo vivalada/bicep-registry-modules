@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "14479822630783514306"
+      "templateHash": "16187984297445388534"
     },
     "name": "AVS Private Cloud",
     "description": "This module deploys an AVS Private Cloud.",
@@ -816,7 +816,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "15371484679824725403"
+              "templateHash": "3530084272993176151"
             },
             "name": "AVS Private Cloud Authorizations",
             "description": "This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.",
@@ -849,6 +849,7 @@
             },
             "location": {
               "type": "string",
+              "defaultValue": "[resourceGroup().location]",
               "metadata": {
                 "description": "Required. Location of the resources."
               }
