@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "3441390730703148648"
+      "templateHash": "12978784045153299152"
     },
     "name": "AVS Private Cloud Clusters Datastores",
     "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
@@ -49,5 +49,28 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NetApp datastore."
+      },
+      "value": "[parameters('netAppDatastoreName')]"
+    },
+    "id": {
+      "type": "string",
+      "metadata": {
+        "description": "The Resource ID of the NetApp datastore."
+      },
+      "value": "[resourceId('Microsoft.AVS/privateClouds/clusters/datastores', parameters('privateCloudName'), parameters('clusterName'), parameters('netAppDatastoreName'))]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group of the deployed resource."
+      },
+      "value": "[resourceGroup().name]"
+    }
+  }
 }

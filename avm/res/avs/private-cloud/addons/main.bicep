@@ -77,4 +77,25 @@ resource Arc 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
 output resourceGroupName string = resourceGroup().name
 
 @description('The name of the HCX Addon.')
-output hcxAddonName string = hcxAddonEnabled ? HCX.name : ''
+output name string = hcxAddonEnabled ? HCX.name : ''
+
+@description('The ResourceId of the HCX Addon.')
+output resourceId string = hcxAddonEnabled ? HCX.id : ''
+
+@description('The name of the SRM Addon.')
+output srmAddonName string = srmAddonEnabled ? SRM.name : ''
+
+@description('The ResourceId of the SRM Addon.')
+output srmAddonId string = srmAddonEnabled ? SRM.id : ''
+
+@description('The name of the VR Addon.')
+output vrAddonName string = srmAddonEnabled ? VR.name : ''
+
+@description('The ResourceId of the VR Addon.')
+output vrAddonId string = srmAddonEnabled ? VR.id : ''
+
+@description('The name of the ARC Addon.')
+output arcAddonName string = arcAddonEnabled ? Arc.name : ''
+
+@description('The ResourceId of the ARC Addon.')
+output arcAddonId string = arcAddonEnabled ? Arc.id : ''

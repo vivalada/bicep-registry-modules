@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "12351509657260534156"
+      "templateHash": "15371484679824725403"
     },
     "name": "AVS Private Cloud Authorizations",
     "description": "This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.",
@@ -72,12 +72,40 @@
     }
   ],
   "outputs": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Authorization Key."
+      },
+      "value": "[parameters('authKeyName')]"
+    },
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ResourceId of the Authorization Key."
+      },
+      "value": "[resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName'))]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group of the deployed resource."
+      },
+      "value": "[resourceGroup().name]"
+    },
     "expressRouteAuthKey": {
       "type": "string",
       "metadata": {
         "description": "The Authorization Key."
       },
       "value": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+    },
+    "connectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Connection."
+      },
+      "value": "[parameters('connectionName')]"
     },
     "connectionId": {
       "type": "string",

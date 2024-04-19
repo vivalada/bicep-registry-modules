@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "16323338357034281765"
+      "templateHash": "10042575780521480807"
     },
     "name": "AVS Private Cloud Addons",
     "description": "This module deploys a AVS Addons, when any Addon is enabled.",
@@ -115,12 +115,61 @@
       },
       "value": "[resourceGroup().name]"
     },
-    "hcxAddonName": {
+    "name": {
       "type": "string",
       "metadata": {
         "description": "The name of the HCX Addon."
       },
       "value": "[if(parameters('hcxAddonEnabled'), 'hcx', '')]"
+    },
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ResourceId of the HCX Addon."
+      },
+      "value": "[if(parameters('hcxAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'hcx'), '')]"
+    },
+    "srmAddonName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the SRM Addon."
+      },
+      "value": "[if(parameters('srmAddonEnabled'), 'srm', '')]"
+    },
+    "srmAddonId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ResourceId of the SRM Addon."
+      },
+      "value": "[if(parameters('srmAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'srm'), '')]"
+    },
+    "vrAddonName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the VR Addon."
+      },
+      "value": "[if(parameters('srmAddonEnabled'), 'vr', '')]"
+    },
+    "vrAddonId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ResourceId of the VR Addon."
+      },
+      "value": "[if(parameters('srmAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'vr'), '')]"
+    },
+    "arcAddonName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the ARC Addon."
+      },
+      "value": "[if(parameters('arcAddonEnabled'), 'Arc', '')]"
+    },
+    "arcAddonId": {
+      "type": "string",
+      "metadata": {
+        "description": "The ResourceId of the ARC Addon."
+      },
+      "value": "[if(parameters('arcAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'Arc'), '')]"
     }
   }
 }

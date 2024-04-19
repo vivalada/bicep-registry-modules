@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "15144128646715562591"
+      "templateHash": "898503869929144545"
     },
     "name": "AVS Private Cloud",
     "description": "This module deploys an AVS Private Cloud.",
@@ -609,7 +609,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "16323338357034281765"
+              "templateHash": "10042575780521480807"
             },
             "name": "AVS Private Cloud Addons",
             "description": "This module deploys a AVS Addons, when any Addon is enabled.",
@@ -719,12 +719,61 @@
               },
               "value": "[resourceGroup().name]"
             },
-            "hcxAddonName": {
+            "name": {
               "type": "string",
               "metadata": {
                 "description": "The name of the HCX Addon."
               },
               "value": "[if(parameters('hcxAddonEnabled'), 'hcx', '')]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ResourceId of the HCX Addon."
+              },
+              "value": "[if(parameters('hcxAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'hcx'), '')]"
+            },
+            "srmAddonName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the SRM Addon."
+              },
+              "value": "[if(parameters('srmAddonEnabled'), 'srm', '')]"
+            },
+            "srmAddonId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ResourceId of the SRM Addon."
+              },
+              "value": "[if(parameters('srmAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'srm'), '')]"
+            },
+            "vrAddonName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the VR Addon."
+              },
+              "value": "[if(parameters('srmAddonEnabled'), 'vr', '')]"
+            },
+            "vrAddonId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ResourceId of the VR Addon."
+              },
+              "value": "[if(parameters('srmAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'vr'), '')]"
+            },
+            "arcAddonName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the ARC Addon."
+              },
+              "value": "[if(parameters('arcAddonEnabled'), 'Arc', '')]"
+            },
+            "arcAddonId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ResourceId of the ARC Addon."
+              },
+              "value": "[if(parameters('arcAddonEnabled'), resourceId('Microsoft.AVS/privateClouds/addons', parameters('privateCloudName'), 'Arc'), '')]"
             }
           }
         }
@@ -767,7 +816,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "12351509657260534156"
+              "templateHash": "15371484679824725403"
             },
             "name": "AVS Private Cloud Authorizations",
             "description": "This module creates a connection between AVS SDDC and a vNet, when Networking Connectivity is enabled.",
@@ -834,12 +883,40 @@
             }
           ],
           "outputs": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Authorization Key."
+              },
+              "value": "[parameters('authKeyName')]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "The ResourceId of the Authorization Key."
+              },
+              "value": "[resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName'))]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "metadata": {
+                "description": "The resource group of the deployed resource."
+              },
+              "value": "[resourceGroup().name]"
+            },
             "expressRouteAuthKey": {
               "type": "string",
               "metadata": {
                 "description": "The Authorization Key."
               },
               "value": "[reference(resourceId('Microsoft.AVS/privateClouds/authorizations', parameters('privateCloudName'), parameters('authKeyName')), '2023-03-01').expressRouteAuthorizationKey]"
+            },
+            "connectionName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Connection."
+              },
+              "value": "[parameters('connectionName')]"
             },
             "connectionId": {
               "type": "string",
@@ -886,7 +963,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "3441390730703148648"
+              "templateHash": "12978784045153299152"
             },
             "name": "AVS Private Cloud Clusters Datastores",
             "description": "This module attaches a NetApp storage to the AVS cluster, when Datastore connectivity is enabled.",
@@ -930,7 +1007,30 @@
                 }
               }
             }
-          ]
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the NetApp datastore."
+              },
+              "value": "[parameters('netAppDatastoreName')]"
+            },
+            "id": {
+              "type": "string",
+              "metadata": {
+                "description": "The Resource ID of the NetApp datastore."
+              },
+              "value": "[resourceId('Microsoft.AVS/privateClouds/clusters/datastores', parameters('privateCloudName'), parameters('clusterName'), parameters('netAppDatastoreName'))]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "metadata": {
+                "description": "The resource group of the deployed resource."
+              },
+              "value": "[resourceGroup().name]"
+            }
+          }
         }
       },
       "dependsOn": [

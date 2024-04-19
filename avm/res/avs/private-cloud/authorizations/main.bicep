@@ -47,8 +47,21 @@ resource connection 'Microsoft.Network/connections@2023-09-01' = {
   }
 }
 
+//Outputs
+@description('The name of the Authorization Key.')
+output name string = expressRouteAuthKey.name
+
+@description('The ResourceId of the Authorization Key.')
+output resourceId string = expressRouteAuthKey.id
+
+@description('The resource group of the deployed resource.')
+output resourceGroupName string = resourceGroup().name
+
 @description('The Authorization Key.')
 output expressRouteAuthKey string = expressRouteAuthKey.properties.expressRouteAuthorizationKey
+
+@description('The name of the Connection.')
+output connectionName string = connection.name
 
 @description('The Connection ID.')
 output connectionId string = connection.id

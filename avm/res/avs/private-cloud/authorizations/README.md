@@ -70,7 +70,11 @@ The name of the AVS private cloud.
 | Output | Type | Description |
 | :-- | :-- | :-- |
 | `connectionId` | string | The Connection ID. |
+| `connectionName` | string | The name of the Connection. |
 | `expressRouteAuthKey` | string | The Authorization Key. |
+| `name` | string | The name of the Authorization Key. |
+| `resourceGroupName` | string | The resource group of the deployed resource. |
+| `resourceId` | string | The ResourceId of the Authorization Key. |
 
 ## Cross-referenced modules
 

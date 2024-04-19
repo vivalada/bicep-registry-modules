@@ -103,8 +103,15 @@ Number of vSphere Replication Servers to be created if SRM Addon is enabled.
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
-| `hcxAddonName` | string | The name of the HCX Addon. |
+| `arcAddonId` | string | The ResourceId of the ARC Addon. |
+| `arcAddonName` | string | The name of the ARC Addon. |
+| `name` | string | The name of the HCX Addon. |
 | `resourceGroupName` | string | The resource group of the deployed resource. |
+| `resourceId` | string | The ResourceId of the HCX Addon. |
+| `srmAddonId` | string | The ResourceId of the SRM Addon. |
+| `srmAddonName` | string | The name of the SRM Addon. |
+| `vrAddonId` | string | The ResourceId of the VR Addon. |
+| `vrAddonName` | string | The name of the VR Addon. |
 
 ## Cross-referenced modules
 
