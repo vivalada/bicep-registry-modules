@@ -302,8 +302,8 @@ output name string = privateCloud.name
 @description('The resource ID of the deployed resource.')
 output resourceId string = privateCloud.id
 
-//@description('The resource group of the deployed resource.')
-//output resourceGroupName string = resourceGroup().name
+@description('The resource group of the deployed resource.')
+output resourceGroupName string = resourceGroup().name
 
 @description('The location the resource was deployed into.')
 output location string = privateCloud.location

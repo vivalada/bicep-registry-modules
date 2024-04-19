@@ -73,3 +73,8 @@ resource Arc 'Microsoft.AVS/privateClouds/addons@2023-03-01' =
   }
 
 // Outputs
+@description('The resource group of the deployed resource.')
+output resourceGroupName string = resourceGroup().name
+
+@description('The name of the HCX Addon.')
+output hcxAddonName string = hcxAddonEnabled ? HCX.name : ''

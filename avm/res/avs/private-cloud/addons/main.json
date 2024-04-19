@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "2682269963635990238"
+      "templateHash": "16323338357034281765"
     },
     "name": "AVS Private Cloud Addons",
     "description": "This module deploys a AVS Addons, when any Addon is enabled.",
@@ -106,5 +106,21 @@
         "vCenter": "[parameters('vcenterResourceId')]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group of the deployed resource."
+      },
+      "value": "[resourceGroup().name]"
+    },
+    "hcxAddonName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the HCX Addon."
+      },
+      "value": "[if(parameters('hcxAddonEnabled'), 'hcx', '')]"
+    }
+  }
 }

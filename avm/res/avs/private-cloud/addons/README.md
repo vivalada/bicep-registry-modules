@@ -101,8 +101,10 @@ Number of vSphere Replication Servers to be created if SRM Addon is enabled.
 
 ## Outputs
 
-| Output | Type |
-| :-- | :-- |
+| Output | Type | Description |
+| :-- | :-- | :-- |
+| `hcxAddonName` | string | The name of the HCX Addon. |
+| `resourceGroupName` | string | The resource group of the deployed resource. |
 
 ## Cross-referenced modules
 

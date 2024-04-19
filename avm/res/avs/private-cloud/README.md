@@ -1145,6 +1145,7 @@ The password value to use for the cloudadmin account password in the local domai
 | :-- | :-- | :-- |
 | `location` | string | The location the resource was deployed into. |
 | `name` | string | The name of the deployed resource. |
+| `resourceGroupName` | string | The resource group of the deployed resource. |
 | `resourceId` | string | The resource ID of the deployed resource. |
 
 ## Cross-referenced modules
