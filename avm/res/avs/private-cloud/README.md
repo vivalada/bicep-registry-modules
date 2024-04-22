@@ -52,7 +52,7 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
   params: {
     // Required parameters
     clusterSize: 3
-    name: 'sddcdef-001'
+    name: 'sddcmin-001'
     networkBlock: '10.34.0.0/22'
     skuName: 'AV36P'
     // Non-required parameters
@@ -78,7 +78,7 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
       "value": 3
     },
     "name": {
-      "value": "sddcdef-001"
+      "value": "sddcmin-001"
     },
     "networkBlock": {
       "value": "10.34.0.0/22"

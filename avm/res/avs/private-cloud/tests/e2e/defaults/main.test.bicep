@@ -13,7 +13,7 @@ param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceSh
 param location string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'sddcdef'
+param serviceShort string = 'sddcmin'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = '#_namePrefix_#'
