@@ -7,7 +7,7 @@ metadata description = 'This instance deploys the module with most of its featur
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = '${namePrefix}-avs.privatecloud-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -48,10 +48,10 @@ module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/t
   scope: resourceGroup
   name: '${uniqueString(deployment().name, location)}-diagnosticDependencies'
   params: {
-    storageAccountName: 'dep${namePrefix}diasa${serviceShort}01'
-    logAnalyticsWorkspaceName: 'dep-${namePrefix}-law-${serviceShort}'
-    eventHubNamespaceEventHubName: 'dep-${namePrefix}-evh-${serviceShort}'
-    eventHubNamespaceName: 'dep-${namePrefix}-evhns-${serviceShort}'
+    storageAccountName: 'dep${namePrefix}${serviceShort}diasa01'
+    logAnalyticsWorkspaceName: 'dep-${namePrefix}-${serviceShort}-law'
+    eventHubNamespaceEventHubName: 'dep-${namePrefix}-${serviceShort}-evh'
+    eventHubNamespaceName: 'dep-${namePrefix}-${serviceShort}-evhns'
     location: location
   }
 }
@@ -101,9 +101,9 @@ module testDeployment '../../../main.bicep' = [
         }
       ]
       tags: {
-        Environment: 'Test'
-        Source: 'AVM'
-        TestType: 'Interfaces'
+        'hidden-title': 'This is visible in the resource name'
+        Environment: 'Non-Prod'
+        Role: 'DeploymentValidation'
       }
     }
     dependsOn: [

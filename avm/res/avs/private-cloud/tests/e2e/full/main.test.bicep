@@ -7,7 +7,7 @@ metadata description = 'This instance deploys the module with most of its featur
 
 @description('Optional. The name of the resource group to deploy for testing purposes.')
 @maxLength(90)
-param resourceGroupName string = '${namePrefix}-avs.privatecloud-${serviceShort}-rg'
+param resourceGroupName string = 'dep-${namePrefix}-avs.privatecloud-${serviceShort}-rg'
 
 @description('Optional. The location to deploy resources to.')
 param location string = deployment().location
@@ -38,20 +38,20 @@ module nestedDependencies 'dependencies.bicep' = {
   scope: resourceGroup
   name: '${uniqueString(deployment().name, location)}-nestedDependencies'
   params: {
-    managedIdentityName: '${namePrefix}-${serviceShort}-mi'
-    natGatewayPublicIPName: '${namePrefix}-${serviceShort}-natgw-ip'
-    natGatewayName: '${namePrefix}-${serviceShort}-natgw'
-    gatewayVNetName: '${namePrefix}-${serviceShort}-gwvnet'
-    gatewayPublicIPName: '${namePrefix}-${serviceShort}-gw-ip'
-    gatewayName: '${namePrefix}-${serviceShort}-gw'
-    bastionPublicIPName: '${namePrefix}-${serviceShort}-bastion-ip'
-    bastionName: '${namePrefix}-${serviceShort}-bastion'
-    keyVaultName: '${namePrefix}-${serviceShort}-${substring(uniqueString(baseTime), 0, 3)}-kv'
-    anfAccountName: '${namePrefix}-${serviceShort}-anfacc'
-    anfPoolName: '${namePrefix}-${serviceShort}-anfpool'
-    anfVolumeName: '${namePrefix}-${serviceShort}-anfvol'
-    jumpVMNICName: '${namePrefix}-${serviceShort}-jumpvm-nic'
-    jumpVMName: '${namePrefix}-${serviceShort}-jumpvm'
+    managedIdentityName: 'dep-${namePrefix}-${serviceShort}-mi'
+    natGatewayPublicIPName: 'dep-${namePrefix}-${serviceShort}-natgw-ip'
+    natGatewayName: 'dep-${namePrefix}-${serviceShort}-natgw'
+    gatewayVNetName: 'dep-${namePrefix}-${serviceShort}-gwvnet'
+    gatewayPublicIPName: 'dep-${namePrefix}-${serviceShort}-gw-ip'
+    gatewayName: 'dep-${namePrefix}-${serviceShort}-gw'
+    bastionPublicIPName: 'dep-${namePrefix}-${serviceShort}-bastion-ip'
+    bastionName: 'dep-${namePrefix}-${serviceShort}-bastion'
+    keyVaultName: 'dep-${namePrefix}-${serviceShort}-${substring(uniqueString(baseTime), 0, 3)}-kv'
+    anfAccountName: 'dep-${namePrefix}-${serviceShort}-anfacc'
+    anfPoolName: 'dep-${namePrefix}-${serviceShort}-anfpool'
+    anfVolumeName: 'dep-${namePrefix}-${serviceShort}-anfvol'
+    jumpVMNICName: 'dep-${namePrefix}-${serviceShort}-jumpvm-nic'
+    jumpVMName: 'dep-${namePrefix}-${serviceShort}-jumpvm'
     jumpVMAdminUsername: 'avsadmin'
     jumpVMAdminPassword: jumpVMAdminPassword
     location: location
@@ -62,10 +62,10 @@ module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/t
   scope: resourceGroup
   name: '${uniqueString(deployment().name, location)}-diagnosticDependencies'
   params: {
-    storageAccountName: 'dep${namePrefix}diasa${serviceShort}01'
-    logAnalyticsWorkspaceName: 'dep-${namePrefix}-law-${serviceShort}'
-    eventHubNamespaceEventHubName: 'dep-${namePrefix}-evh-${serviceShort}'
-    eventHubNamespaceName: 'dep-${namePrefix}-evhns-${serviceShort}'
+    storageAccountName: 'dep${namePrefix}${serviceShort}diasa01'
+    logAnalyticsWorkspaceName: 'dep-${namePrefix}-${serviceShort}-law'
+    eventHubNamespaceEventHubName: 'dep-${namePrefix}-${serviceShort}-evh'
+    eventHubNamespaceName: 'dep-${namePrefix}-${serviceShort}-evhns'
     location: location
   }
 }
@@ -123,9 +123,9 @@ module testDeployment '../../../main.bicep' = [
         }
       ]
       tags: {
-        Environment: 'AVS'
-        Source: 'AVM'
-        TestType: 'Full'
+        'hidden-title': 'This is visible in the resource name'
+        Environment: 'Non-Prod'
+        Role: 'DeploymentValidation'
       }
     }
     dependsOn: [

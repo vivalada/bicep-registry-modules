@@ -52,7 +52,7 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
   params: {
     // Required parameters
     clusterSize: 3
-    name: 'sddcmin-001'
+    name: 'sddcdef-001'
     networkBlock: '10.34.0.0/22'
     skuName: 'AV36P'
     // Non-required parameters
@@ -78,7 +78,7 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
       "value": 3
     },
     "name": {
-      "value": "sddcmin-001"
+      "value": "sddcdef-001"
     },
     "networkBlock": {
       "value": "10.34.0.0/22"
@@ -158,9 +158,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     srmReplicationServersCount: 3
     stretchClusterEnabled: false
     tags: {
-      Environment: 'AVS'
-      Source: 'AVM'
-      TestType: 'Full'
+      Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
+      Role: 'DeploymentValidation'
     }
   }
 }
@@ -273,9 +273,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     },
     "tags": {
       "value": {
-        "Environment": "AVS",
-        "Source": "AVM",
-        "TestType": "Full"
+        "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
+        "Role": "DeploymentValidation"
       }
     }
   }
@@ -337,9 +337,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     secondaryZone: 2
     stretchClusterEnabled: false
     tags: {
-      Environment: 'Test'
-      Source: 'AVM'
-      TestType: 'Interfaces'
+      Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
+      Role: 'DeploymentValidation'
     }
     vcenterPassword: '<vcenterPassword>'
   }
@@ -426,9 +426,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     },
     "tags": {
       "value": {
-        "Environment": "Test",
-        "Source": "AVM",
-        "TestType": "Interfaces"
+        "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
+        "Role": "DeploymentValidation"
       }
     },
     "vcenterPassword": {
@@ -491,9 +491,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     ]
     stretchClusterEnabled: true
     tags: {
-      Environment: 'Test'
-      Source: 'AVM'
-      TestType: 'Interfaces'
+      Environment: 'Non-Prod'
+      'hidden-title': 'This is visible in the resource name'
+      Role: 'DeploymentValidation'
     }
     vcenterPassword: '<vcenterPassword>'
   }
@@ -574,9 +574,9 @@ module privateCloud 'br/public:avm/res/avs/private-cloud:<version>' = {
     },
     "tags": {
       "value": {
-        "Environment": "Test",
-        "Source": "AVM",
-        "TestType": "Interfaces"
+        "Environment": "Non-Prod",
+        "hidden-title": "This is visible in the resource name",
+        "Role": "DeploymentValidation"
       }
     },
     "vcenterPassword": {
