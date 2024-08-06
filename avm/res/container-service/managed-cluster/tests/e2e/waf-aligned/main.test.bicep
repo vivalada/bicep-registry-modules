@@ -83,9 +83,11 @@ module testDeployment '../../../main.bicep' = [
           minCount: 3
           mode: 'System'
           name: 'systempool'
+          nodeTaints: [
+            'CriticalAddonsOnly=true:NoSchedule'
+          ]
           osDiskSizeGB: 0
           osType: 'Linux'
-          serviceCidr: ''
           type: 'VirtualMachineScaleSets'
           vmSize: 'Standard_DS2_v2'
           vnetSubnetID: '${nestedDependencies.outputs.vNetResourceId}/subnets/defaultSubnet'
@@ -105,9 +107,6 @@ module testDeployment '../../../main.bicep' = [
           mode: 'User'
           name: 'userpool1'
           nodeLabels: {}
-          nodeTaints: [
-            'CriticalAddonsOnly=true:NoSchedule'
-          ]
           osDiskType: 'Ephemeral'
           osDiskSizeGB: 60
           osType: 'Linux'
@@ -130,9 +129,6 @@ module testDeployment '../../../main.bicep' = [
           mode: 'User'
           name: 'userpool2'
           nodeLabels: {}
-          nodeTaints: [
-            'CriticalAddonsOnly=true:NoSchedule'
-          ]
           osDiskType: 'Ephemeral'
           osDiskSizeGB: 60
           osType: 'Linux'

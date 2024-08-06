@@ -49,6 +49,7 @@ module nestedDependencies 'dependencies.bicep' = {
     storageAccountName: 'dep${namePrefix}sa${serviceShort}01'
     storageUploadDeploymentScriptName: 'dep-${namePrefix}-sads-${serviceShort}'
     proximityPlacementGroupName: 'dep-${namePrefix}-ppg-${serviceShort}'
+    backupManagementServiceApplicationObjectId: '268f6a53-9f68-4a38-ae47-166f730d86af' // Tenant-specific Backup Management Service Enterprise Application Object Id
   }
 }
 
@@ -104,19 +105,33 @@ module testDeployment '../../../main.bicep' = [
               name: 'ipconfig01'
               pipConfiguration: {
                 publicIpNameSuffix: '-pip-01'
+                zones: [
+                  1
+                  2
+                  3
+                ]
                 roleAssignments: [
                   {
-                    roleDefinitionIdOrName: 'Reader'
+                    name: 'e962e7c1-261a-4afd-b5ad-17a640a0b7bc'
+                    roleDefinitionIdOrName: 'Owner'
+                    principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+                    principalType: 'ServicePrincipal'
+                  }
+                  {
+                    roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+                    principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+                    principalType: 'ServicePrincipal'
+                  }
+                  {
+                    roleDefinitionIdOrName: subscriptionResourceId(
+                      'Microsoft.Authorization/roleDefinitions',
+                      'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+                    )
                     principalId: nestedDependencies.outputs.managedIdentityPrincipalId
                     principalType: 'ServicePrincipal'
                   }
                 ]
               }
-              zones: [
-                '1'
-                '2'
-                '3'
-              ]
               subnetResourceId: nestedDependencies.outputs.subnetResourceId
               diagnosticSettings: [
                 {
@@ -134,10 +149,25 @@ module testDeployment '../../../main.bicep' = [
               ]
             }
           ]
-          nicSuffix: '-nic-01'
+          name: 'nic-test-01'
+          enableIPForwarding: true
           roleAssignments: [
             {
-              roleDefinitionIdOrName: 'Reader'
+              name: '95fc1cc2-05ed-4f5a-a22c-a6ca852df7e7'
+              roleDefinitionIdOrName: 'Owner'
+              principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+              principalType: 'ServicePrincipal'
+            }
+            {
+              roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+              principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+              principalType: 'ServicePrincipal'
+            }
+            {
+              roleDefinitionIdOrName: subscriptionResourceId(
+                'Microsoft.Authorization/roleDefinitions',
+                'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+              )
               principalId: nestedDependencies.outputs.managedIdentityPrincipalId
               principalType: 'ServicePrincipal'
             }
@@ -171,7 +201,7 @@ module testDeployment '../../../main.bicep' = [
       osType: 'Windows'
       vmSize: 'Standard_DS2_v2'
       adminPassword: password
-      availabilityZone: 2
+      zone: 2
       backupPolicyName: nestedDependencies.outputs.recoveryServicesVaultBackupPolicyName
       backupVaultName: nestedDependencies.outputs.recoveryServicesVaultName
       backupVaultResourceGroup: nestedDependencies.outputs.recoveryServicesVaultResourceGroupName
@@ -201,7 +231,17 @@ module testDeployment '../../../main.bicep' = [
       ]
       enableAutomaticUpdates: true
       patchMode: 'AutomaticByPlatform'
+      rebootSetting: 'IfRequired'
       encryptionAtHost: false
+      autoShutdownConfig: {
+        status: 'Enabled'
+        dailyRecurrenceTime: '19:00'
+        timeZone: 'UTC'
+        notificationStatus: 'Enabled'
+        notificationEmail: 'test@contoso.com'
+        notificationLocale: 'en'
+        notificationTimeInMinutes: 30
+      }
       extensionAntiMalwareConfig: {
         enabled: true
         settings: {
@@ -244,6 +284,7 @@ module testDeployment '../../../main.bicep' = [
       }
       extensionDependencyAgentConfig: {
         enabled: true
+        enableAMA: true
         tags: {
           'hidden-title': 'This is visible in the resource name'
           Environment: 'Non-Prod'
@@ -308,11 +349,13 @@ module testDeployment '../../../main.bicep' = [
       proximityPlacementGroupResourceId: nestedDependencies.outputs.proximityPlacementGroupResourceId
       roleAssignments: [
         {
+          name: 'c70e8c48-6945-4607-9695-1098ba5a86ed'
           roleDefinitionIdOrName: 'Owner'
           principalId: nestedDependencies.outputs.managedIdentityPrincipalId
           principalType: 'ServicePrincipal'
         }
         {
+          name: guid('Custom seed ${namePrefix}${serviceShort}')
           roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
           principalId: nestedDependencies.outputs.managedIdentityPrincipalId
           principalType: 'ServicePrincipal'

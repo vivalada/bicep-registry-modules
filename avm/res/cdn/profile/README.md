@@ -64,7 +64,9 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
         name: 'dep-test-cdnpafd-afd-endpoint'
         routes: [
           {
-            customDomainName: 'dep-test-cdnpafd-custom-domain'
+            customDomainNames: [
+              'dep-test-cdnpafd-custom-domain'
+            ]
             name: 'dep-test-cdnpafd-afd-route'
             originGroupName: 'dep-test-cdnpafd-origin-group'
             ruleSets: [
@@ -84,8 +86,7 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
       }
     ]
     location: 'global'
-    originResponseTimeoutSeconds: 60
-    origionGroups: [
+    originGroups: [
       {
         loadBalancingSettings: {
           additionalLatencyInMilliseconds: 50
@@ -101,6 +102,7 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
         ]
       }
     ]
+    originResponseTimeoutSeconds: 60
     ruleSets: [
       {
         name: 'deptestcdnpafdruleset'
@@ -154,7 +156,9 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
           "name": "dep-test-cdnpafd-afd-endpoint",
           "routes": [
             {
-              "customDomainName": "dep-test-cdnpafd-custom-domain",
+              "customDomainNames": [
+                "dep-test-cdnpafd-custom-domain"
+              ],
               "name": "dep-test-cdnpafd-afd-route",
               "originGroupName": "dep-test-cdnpafd-origin-group",
               "ruleSets": [
@@ -179,10 +183,7 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
     "location": {
       "value": "global"
     },
-    "originResponseTimeoutSeconds": {
-      "value": 60
-    },
-    "origionGroups": {
+    "originGroups": {
       "value": [
         {
           "loadBalancingSettings": {
@@ -199,6 +200,9 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
           ]
         }
       ]
+    },
+    "originResponseTimeoutSeconds": {
+      "value": 60
     },
     "ruleSets": {
       "value": [
@@ -339,11 +343,13 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
     originResponseTimeoutSeconds: 60
     roleAssignments: [
       {
+        name: '50362c78-6910-43c3-8639-9cae123943bb'
         principalId: '<principalId>'
         principalType: 'ServicePrincipal'
         roleDefinitionIdOrName: 'Owner'
       }
       {
+        name: '<name>'
         principalId: '<principalId>'
         principalType: 'ServicePrincipal'
         roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
@@ -425,11 +431,13 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
     "roleAssignments": {
       "value": [
         {
+          "name": "50362c78-6910-43c3-8639-9cae123943bb",
           "principalId": "<principalId>",
           "principalType": "ServicePrincipal",
           "roleDefinitionIdOrName": "Owner"
         },
         {
+          "name": "<name>",
           "principalId": "<principalId>",
           "principalType": "ServicePrincipal",
           "roleDefinitionIdOrName": "b24988ac-6180-42a0-ab88-20f7382dd24c"
@@ -580,7 +588,7 @@ module profile 'br/public:avm/res/cdn/profile:<version>' = {
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`origionGroups`](#parameter-origiongroups) | array | Array of origin group objects. Required if the afdEndpoints is specified. |
+| [`originGroups`](#parameter-origingroups) | array | Array of origin group objects. Required if the afdEndpoints is specified. |
 
 **Optional parameters**
 
@@ -619,7 +627,6 @@ The pricing tier (defines a CDN provider, feature list and rate) of the CDN prof
     'Premium_AzureFrontDoor'
     'Premium_Verizon'
     'Standard_955BandWidth_ChinaCdn'
-    'Standard_Akamai'
     'Standard_AvgBandWidth_ChinaCdn'
     'Standard_AzureFrontDoor'
     'Standard_ChinaCdn'
@@ -631,7 +638,7 @@ The pricing tier (defines a CDN provider, feature list and rate) of the CDN prof
   ]
   ```
 
-### Parameter: `origionGroups`
+### Parameter: `originGroups`
 
 Array of origin group objects. Required if the afdEndpoints is specified.
 
@@ -751,6 +758,7 @@ Array of role assignments to create.
 | [`conditionVersion`](#parameter-roleassignmentsconditionversion) | string | Version of the condition. |
 | [`delegatedManagedIdentityResourceId`](#parameter-roleassignmentsdelegatedmanagedidentityresourceid) | string | The Resource Id of the delegated managed identity resource. |
 | [`description`](#parameter-roleassignmentsdescription) | string | The description of the role assignment. |
+| [`name`](#parameter-roleassignmentsname) | string | The name (as GUID) of the role assignment. If not provided, a GUID will be generated. |
 | [`principalType`](#parameter-roleassignmentsprincipaltype) | string | The principal type of the assigned principal ID. |
 
 ### Parameter: `roleAssignments.principalId`
@@ -801,6 +809,13 @@ The description of the role assignment.
 - Required: No
 - Type: string
 
+### Parameter: `roleAssignments.name`
+
+The name (as GUID) of the role assignment. If not provided, a GUID will be generated.
+
+- Required: No
+- Type: string
+
 ### Parameter: `roleAssignments.principalType`
 
 The principal type of the assigned principal ID.
@@ -846,11 +861,14 @@ Endpoint tags.
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
+| `endpointId` | string | The resource ID of the CDN profile endpoint. |
+| `endpointName` | string | The name of the CDN profile endpoint. |
 | `location` | string | The location the resource was deployed into. |
 | `name` | string | The name of the CDN profile. |
 | `profileType` | string | The type of the CDN profile. |
 | `resourceGroupName` | string | The resource group where the CDN profile is deployed. |
 | `resourceId` | string | The resource ID of the CDN profile. |
+| `uri` | string | The uri of the CDN profile endpoint. |
 
 ## Cross-referenced modules
 

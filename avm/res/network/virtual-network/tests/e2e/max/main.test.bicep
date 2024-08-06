@@ -97,7 +97,22 @@ module testDeployment '../../../main.bicep' = [
       }
       roleAssignments: [
         {
-          roleDefinitionIdOrName: 'Reader'
+          name: 'f5c27a7b-9b18-4dc1-b002-db3c38e80b64'
+          roleDefinitionIdOrName: 'Owner'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+        {
+          name: guid('Custom seed ${namePrefix}${serviceShort}')
+          roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+        {
+          roleDefinitionIdOrName: subscriptionResourceId(
+            'Microsoft.Authorization/roleDefinitions',
+            'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+          )
           principalId: nestedDependencies.outputs.managedIdentityPrincipalId
           principalType: 'ServicePrincipal'
         }
@@ -114,7 +129,20 @@ module testDeployment '../../../main.bicep' = [
           networkSecurityGroupResourceId: nestedDependencies.outputs.networkSecurityGroupResourceId
           roleAssignments: [
             {
-              roleDefinitionIdOrName: 'Reader'
+              roleDefinitionIdOrName: 'Owner'
+              principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+              principalType: 'ServicePrincipal'
+            }
+            {
+              roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+              principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+              principalType: 'ServicePrincipal'
+            }
+            {
+              roleDefinitionIdOrName: subscriptionResourceId(
+                'Microsoft.Authorization/roleDefinitions',
+                'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+              )
               principalId: nestedDependencies.outputs.managedIdentityPrincipalId
               principalType: 'ServicePrincipal'
             }
@@ -151,11 +179,18 @@ module testDeployment '../../../main.bicep' = [
         }
         {
           addressPrefix: cidrSubnet(addressPrefix, 24, 4)
+          name: '${namePrefix}-az-subnet-x-004'
+          networkSecurityGroupResourceId: ''
+          natGatewayResourceId: ''
+          routeTableResourceId: ''
+        }
+        {
+          addressPrefix: cidrSubnet(addressPrefix, 24, 5)
           name: 'AzureBastionSubnet'
           networkSecurityGroupResourceId: nestedDependencies.outputs.networkSecurityGroupBastionResourceId
         }
         {
-          addressPrefix: cidrSubnet(addressPrefix, 24, 5)
+          addressPrefix: cidrSubnet(addressPrefix, 24, 6)
           name: 'AzureFirewallSubnet'
         }
       ]

@@ -38,6 +38,7 @@ module nestedDependencies 'dependencies.bicep' = {
     virtualNetworkName: 'dep-${namePrefix}-vnet-${serviceShort}'
     location: resourceLocation
     managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
+    storageAccountName: 'dep${namePrefix}sa${serviceShort}'
   }
 }
 
@@ -46,55 +47,83 @@ module nestedDependencies 'dependencies.bicep' = {
 // ============== //
 
 @batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem' ]: {
-  scope: resourceGroup
-  name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
-  params: {
-    name: '${namePrefix}${serviceShort}001'
-    logAnalyticsWorkspaceResourceId: nestedDependencies.outputs.logAnalyticsWorkspaceResourceId
-    location: resourceLocation
-    workloadProfiles: [
-      {
-        workloadProfileType: 'D4'
-        name: 'CAW01'
-        minimumCount: 0
-        maximumCount: 3
+module testDeployment '../../../main.bicep' = [
+  for iteration in ['init', 'idem']: {
+    scope: resourceGroup
+    name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
+    params: {
+      name: '${namePrefix}${serviceShort}001'
+      logAnalyticsWorkspaceResourceId: nestedDependencies.outputs.logAnalyticsWorkspaceResourceId
+      location: resourceLocation
+      workloadProfiles: [
+        {
+          workloadProfileType: 'D4'
+          name: 'CAW01'
+          minimumCount: 0
+          maximumCount: 3
+        }
+      ]
+      internal: true
+      dockerBridgeCidr: '172.16.0.1/28'
+      platformReservedCidr: '172.17.17.0/24'
+      platformReservedDnsIP: '172.17.17.17'
+      infrastructureSubnetId: nestedDependencies.outputs.subnetResourceId
+      infrastructureResourceGroupName: 'me-${resourceGroupName}'
+      managedIdentities: {
+        systemAssigned: true
+        userAssignedResourceIds: [
+          nestedDependencies.outputs.managedIdentityResourceId
+        ]
       }
-    ]
-    internal: true
-    dockerBridgeCidr: '172.16.0.1/28'
-    platformReservedCidr: '172.17.17.0/24'
-    platformReservedDnsIP: '172.17.17.17'
-    infrastructureSubnetId: nestedDependencies.outputs.subnetResourceId
-    infrastructureResourceGroupName: 'me-${resourceGroupName}'
-    roleAssignments: [
-      {
-        roleDefinitionIdOrName: 'Owner'
-        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-        principalType: 'ServicePrincipal'
-      }
-      {
-        roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-        principalType: 'ServicePrincipal'
-      }
-      {
-        roleDefinitionIdOrName: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
-        principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-        principalType: 'ServicePrincipal'
-      }
-    ]
+      roleAssignments: [
+        {
+          name: '43fc5250-f111-472b-8722-f1cb4a0e754b'
+          roleDefinitionIdOrName: 'Owner'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+        {
+          name: guid('Custom seed ${namePrefix}${serviceShort}')
+          roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+        {
+          roleDefinitionIdOrName: subscriptionResourceId(
+            'Microsoft.Authorization/roleDefinitions',
+            'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+          )
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+      ]
 
-    lock: {
-      kind: 'CanNotDelete'
-      name: 'myCustomLockName'
+      storages: [
+        {
+          kind: 'SMB'
+          shareName: 'smbfileshare'
+          accessMode: 'ReadWrite'
+          storageAccountName: nestedDependencies.outputs.storageAccountName
+        }
+        {
+          kind: 'NFS'
+          shareName: 'nfsfileshare'
+          accessMode: 'ReadWrite'
+          storageAccountName: nestedDependencies.outputs.storageAccountName
+        }
+      ]
+
+      lock: {
+        kind: 'CanNotDelete'
+        name: 'myCustomLockName'
+      }
+      tags: {
+        'hidden-title': 'This is visible in the resource name'
+        Env: 'test'
+      }
     }
-    tags: {
-      'hidden-title': 'This is visible in the resource name'
-      Env: 'test'
-    }
+    dependsOn: [
+      nestedDependencies
+    ]
   }
-  dependsOn: [
-    nestedDependencies
-  ]
-}]
+]

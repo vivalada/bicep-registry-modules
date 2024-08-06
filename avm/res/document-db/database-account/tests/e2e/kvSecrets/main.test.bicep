@@ -11,9 +11,6 @@ metadata description = 'This instance deploys the module saving all its secrets 
 @maxLength(90)
 param resourceGroupName string = 'dep-${namePrefix}-documentdb.databaseaccounts-${serviceShort}-rg'
 
-@description('Optional. The location to deploy resources to.')
-param resourceLocation string = deployment().location
-
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
 param serviceShort string = 'dddaskvs'
 
@@ -21,6 +18,7 @@ param serviceShort string = 'dddaskvs'
 param namePrefix string = '#_namePrefix_#'
 
 // Pipeline is selecting random regions which dont support all cosmos features and have constraints when creating new cosmos
+#disable-next-line no-hardcoded-location
 var enforcedLocation = 'eastasia'
 
 // ============== //
@@ -50,9 +48,24 @@ module testDeployment '../../../main.bicep' = {
   params: {
     location: enforcedLocation
     name: '${namePrefix}-kv-ref'
-    secretsKeyVault: {
-      keyVaultName: nestedDependencies.outputs.keyVaultName
-      primaryReadonlyConnectionStringSecretName: 'custom-secret-name'
+    secretsExportConfiguration: {
+      keyVaultResourceId: nestedDependencies.outputs.keyVaultResourceId
+      primaryReadOnlyKeySecretName: 'primaryReadOnlyKey'
+      primaryWriteKeySecretName: 'primaryWriteKey'
+      primaryReadonlyConnectionStringSecretName: 'primaryReadonlyConnectionString'
+      primaryWriteConnectionStringSecretName: 'primaryWriteConnectionString'
+      secondaryReadonlyConnectionStringSecretName: 'secondaryReadonlyConnectionString'
+      secondaryReadonlyKeySecretName: 'secondaryReadonlyKey'
+      secondaryWriteConnectionStringSecretName: 'secondaryWriteConnectionString'
+      secondaryWriteKeySecretName: 'secondaryWriteKey'
     }
   }
 }
+
+// Output usage examples
+output specificSecret string = testDeployment.outputs.exportedSecrets.primaryReadOnlyKey.secretResourceId
+output allEportedSecrets object = testDeployment.outputs.exportedSecrets
+output allExportedSecretResourceIds array = map(
+  items(testDeployment.outputs.exportedSecrets),
+  item => item.value.secretResourceId
+)

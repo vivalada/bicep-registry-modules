@@ -161,6 +161,14 @@ module testDeployment '../../../main.bicep' = [
       extensionNetworkWatcherAgentConfig: {
         enabled: true
       }
+      extensionHealthConfig: {
+        enabled: true
+        settings: {
+          protocol: 'http'
+          port: 80
+          requestPath: '/'
+        }
+      }
       lock: {
         kind: 'CanNotDelete'
         name: 'myCustomLockName'
@@ -174,6 +182,9 @@ module testDeployment '../../../main.bicep' = [
                 subnet: {
                   id: nestedDependencies.outputs.subnetResourceId
                 }
+                publicIPAddressConfiguration: {
+                  name: '${namePrefix}-pip-${serviceShort}'
+                }
               }
             }
           ]
@@ -182,14 +193,29 @@ module testDeployment '../../../main.bicep' = [
       ]
       roleAssignments: [
         {
+          name: '1910de8c-4dab-4189-96bb-2feb68350fb8'
+          roleDefinitionIdOrName: 'Owner'
           principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-          roleDefinitionIdOrName: 'Reader'
+          principalType: 'ServicePrincipal'
+        }
+        {
+          name: guid('Custom seed ${namePrefix}${serviceShort}')
+          roleDefinitionIdOrName: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+          principalType: 'ServicePrincipal'
+        }
+        {
+          roleDefinitionIdOrName: subscriptionResourceId(
+            'Microsoft.Authorization/roleDefinitions',
+            'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+          )
+          principalId: nestedDependencies.outputs.managedIdentityPrincipalId
           principalType: 'ServicePrincipal'
         }
       ]
       skuCapacity: 1
       managedIdentities: {
-        systemAssigned: true
+        systemAssigned: false
         userAssignedResourceIds: [
           nestedDependencies.outputs.managedIdentityResourceId
         ]
